@@ -24,24 +24,24 @@ int main(void) {
 	MATRIX_IDENTITY = 1;
 
 	// move camera to the right
-	u32 t = floattof32(1.0f), b = floattof32(-1.0f), n = floattof32(0.1f), f = floattof32(30.0f), l = floattof32(-1.3f), r = floattof32(1.3f);
+	u32 t = floattof32(0.11), b = -floattof32(0.11), n = floattof32(0.1f), f = floattof32(30.0f), l = floattof32(-0.13f), r = floattof32(0.13f);
 
 	LOG("%f, %f, %f, %f, %f, %f", t, b, n, f, l, r);
 	// ortho - works fully functional
-	MATRIX_MULT4x4 = divf32(floattof32(2.0f), r - l); MATRIX_MULT4x4 = 0; MATRIX_MULT4x4 = 0; MATRIX_MULT4x4 = 0;
+	/* MATRIX_MULT4x4 = divf32(floattof32(2.0f), r - l); MATRIX_MULT4x4 = 0; MATRIX_MULT4x4 = 0; MATRIX_MULT4x4 = 0;
 	MATRIX_MULT4x4 = 0; MATRIX_MULT4x4 = divf32(floattof32(2.0f), (t - b)); MATRIX_MULT4x4 = 0; MATRIX_MULT4x4 = 0;
 	MATRIX_MULT4x4 = 0; MATRIX_MULT4x4 = 0; MATRIX_MULT4x4 = divf32(floattof32(2.0f), (n - f)); MATRIX_MULT4x4 = 0;
 	MATRIX_MULT4x4 = divf32((l + r), (l - r)); MATRIX_MULT4x4 = divf32((b + t), (b - t)); 
-	MATRIX_MULT4x4 = divf32((n + f), (n - f)); MATRIX_MULT4x4 = floattof32(1.0f);
+	MATRIX_MULT4x4 = divf32((n + f), (n - f)); MATRIX_MULT4x4 = floattof32(1.0f); */
 	//glOrthof32(l, r, b, t, n, f);
 	float asp = (256.0 / 192.0), fov = 70.0;
 	// perspective
-	/* MATRIX_MULT4x4 = divf32(mulf32(floattof32(2.0f), n), (r - l)); MATRIX_MULT4x4 = 0; MATRIX_MULT4x4 = 0; MATRIX_MULT4x4 = 0;
+	MATRIX_MULT4x4 = divf32(mulf32(floattof32(2.0f), n), (r - l)); MATRIX_MULT4x4 = 0; MATRIX_MULT4x4 = 0; MATRIX_MULT4x4 = 0;
 	MATRIX_MULT4x4 = 0; MATRIX_MULT4x4 = divf32(mulf32(floattof32(2.0f), n), (t - b)); MATRIX_MULT4x4 = 0; MATRIX_MULT4x4 = 0;
 	MATRIX_MULT4x4 = divf32((r + l), (r - l)); 
 	MATRIX_MULT4x4 = divf32((t + b), (t - b)); MATRIX_MULT4x4 = divf32((n + f), (n - f)); MATRIX_MULT4x4 = floattof32(-1.0f);
 	MATRIX_MULT4x4 = 0; MATRIX_MULT4x4 = 0; MATRIX_MULT4x4 = divf32(mulf32(floattof32(2.0f), mulf32(n, f)), (n - f)); MATRIX_MULT4x4 = 0;
-	 */
+	
 	//gluPerspective(70.0f, 256.0f / 192.0f, 0.1f, 30.0f);
 	gluLookAt(0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 	
@@ -58,7 +58,7 @@ int main(void) {
 		MATRIX_PUSH = 1;
 
 		glTranslatef32(0, 0, floattof32(-5.0));
-		glScalef(0.5, 0.5, 0.5);
+		//glScalef(0.5, 0.5, 0.5);
 
 		MATRIX_CONTROL = GL_MODELVIEW;
 		//MATRIX_IDENTITY = 1;
