@@ -13,45 +13,35 @@ void drawCube();
 int main(void) {
 	// initialize the required hardware
 	videoSetMode(MODE_0_3D);
-	vramSetBankD(VRAM_D_TEXTURE_SLOT0);
-	vramSetBankF(VRAM_F_TEX_PALETTE_SLOT0);
+	vramSetBankA(VRAM_A_TEXTURE_SLOT0);
+	vramSetBankF(VRAM_F_TEX_PALETTE_SLOT1);
 
-	//dmaCopy(grass_sideBitmap, (void*)VRAM_D, grass_sideBitmapLen);
+	//dmaCopy(grass_sideBitmap, (void*)VRAM_A, grass_sideBitmapLen);
 	//dmaCopy(grass_sidePal, (void*)VRAM_F, grass_sidePalLen);
-	
+
 	glInit();
-	glEnable(GL_TEXTURE_2D | GL_ANTIALIAS);
+	glEnable(GL_TEXTURE_2D | GL_BLEND);
 
 	glClearColor(2, 4, 20, 31);
-	glClearPolyID(63);
 	glClearDepth(GL_MAX_DEPTH);
 	glViewport(0, 0, 255, 191);
 	
 	
 	int texture;
 	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(0, 0, GL_RGB16, TEXTURE_SIZE_16, TEXTURE_SIZE_16, 0, TEXGEN_TEXCOORD, (u8*)grass_sideBitmap);
-	glColorTableEXT(0, 0, grass_sideBitmapLen, 0, 0, (u16*)grass_sideBitmap);
+	glBindTexture(0, texture);
+	glTexImage2D(0, 0, GL_RGB16, TEXTURE_SIZE_16, TEXTURE_SIZE_16, 0, TEXGEN_TEXCOORD, (void*)grass_sideBitmap);
+	glColorTableEXT(0, 0, grass_sidePalLen / 2, 0, 0, (u16*)grass_sidePal);
+	glMaterialf(GL_EMISSION, RGB15(25, 25, 25));
+	
+	//GFX_TEX_FORMAT = (1 << 20) | (1 << 23) | (3 << 26);
 
-	glMaterialf(GL_AMBIENT, RGB15(16, 16 ,16));
-	glMaterialf(GL_DIFFUSE, RGB15(16, 16 ,16));
-	glMaterialf(GL_SPECULAR, BIT(15) | RGB15(8, 8, 8));
-	glMaterialf(GL_EMISSION, RGB15(16, 16 ,16));
-	glMaterialShinyness();
-
-	/* MATRIX_CONTROL = GL_MODELVIEW;
-	MATRIX_IDENTITY = 1;
-	GFX_LIGHT_VECTOR = (floatToFixed(-1.0f, 9) << 20); // light number 1
-	GFX_LIGHT_COLOR = RGB15(31, 31, 31);
-	GFX_DIFFUSE_AMBIENT = RGB15(31, 31, 31) | (RGB15(10, 10, 10) << 16);
- */
-	// rotate the camera 90 degrees to the left
-	/* s16 angle = 0;
-	MATRIX_MULT3x3 = 0; MATRIX_MULT3x3 = floatToFixed(1.0, 12); MATRIX_MULT3x3 = 0;
-	MATRIX_MULT3x3 = cosLerp(degreesToAngle(angle)); MATRIX_MULT3x3 = 0; MATRIX_MULT3x3 = sinLerp(degreesToAngle(angle));
-	MATRIX_MULT3x3 = -sinLerp(degreesToAngle(angle)); MATRIX_MULT3x3 = 0; MATRIX_MULT3x3 = cosLerp(degreesToAngle(angle)); */
-	MATRIX_PUSH = 1;
+	//GFX_PAL_FORMAT = 0;
+	
+	int addr, width;
+	glGetColorTableParameterEXT(0, GL_COLOR_TABLE_FORMAT_EXT, &addr);
+	glGetColorTableParameterEXT(0, GL_COLOR_TABLE_WIDTH_EXT, &width);
+	LOG("Palette addres: %x, width: %d", addr, width);
 	
 	MATRIX_CONTROL = GL_PROJECTION;
 	MATRIX_IDENTITY = 1;	
@@ -83,13 +73,7 @@ int main(void) {
 		MATRIX_MULT3x3 = floattof32(1.0); MATRIX_MULT3x3 = 0; MATRIX_MULT3x3 = 0;
 		MATRIX_MULT3x3 = 0; MATRIX_MULT3x3 = ver_c; MATRIX_MULT3x3 = ver_s;
 		MATRIX_MULT3x3 = 0; MATRIX_MULT3x3 = -ver_s; MATRIX_MULT3x3 = ver_c;
-		
-		GFX_TEX_FORMAT = (1 << 20) | (1 << 23) | (3 << 26) | (1 << 16);
-		GFX_PAL_FORMAT = 8;
 
-		glLight(0, RGB15(0, 0, 0), floattov10(0.7), 0, floattov10(-0.7));
-		glBindTexture(GL_TEXTURE_2D, texture);
-		
 		drawCube();
 
 		MATRIX_POP = 1;
@@ -121,24 +105,29 @@ int main(void) {
 
 void drawCube()
 {
-	GFX_POLY_FORMAT = POLY_ALPHA(16) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0;
+	GFX_POLY_FORMAT = POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_ID(0);
 	GFX_BEGIN = GL_QUADS;
 
 	// front
-	glNormal3f(0.0f, 0.0f, 1.0f);
-	GFX_TEX_COORD = (16 << 20); // lower left coordinate
+	glNormal3f(0.0f, 0.0f, 0.97f);
+	glTexCoord2f(0.0f, 1.0f);
+	//GFX_TEX_COORD = (16 << 20); // lower left coordinate
 	glVertex3f(-0.5f, -0.5, 0.5f);
 
-	GFX_TEX_COORD = 0;	// top felt coordinate
+	glTexCoord2f(0.0f, 0.0f);
+	//GFX_TEX_COORD = 0;	// top felt coordinate
 	glVertex3f(-0.5f, 0.5f, 0.5f);
 
-	GFX_TEX_COORD = (16 << 4); // top right coordinate
+	glTexCoord2f(1.0f, 0.0f);
+	//GFX_TEX_COORD = (16 << 4); // top right coordinate
 	glVertex3f(0.5f, 0.5f, 0.5f);
 
-	GFX_TEX_COORD = ((16 << 4) | (16 << 20)); // lower right coordinate
+	glTexCoord2f(1.0f, 1.0f);
+	//GFX_TEX_COORD = ((16 << 4) | (16 << 20)); // lower right coordinate
 	glVertex3f(0.5f, -0.5f, 0.5f);
 
 	// back
+	glNormal3f(0.0f, 0.0f, -0.97f);
 	glColor3b(255, 0, 0);
 	glVertex3f(0.5f, -0.5f, -0.5f);
 	glColor3b(0, 255, 0);
@@ -149,6 +138,7 @@ void drawCube()
 	glVertex3f(-0.5f, -0.5f, -0.5f);
 
 	// top
+	glNormal3f(0.0f, 0.97f, 0.0f);
 	glColor3b(255, 0, 0);
 	glVertex3f(-0.5f, 0.5f, 0.5f);
 	glColor3b(0, 255, 0);
@@ -159,6 +149,7 @@ void drawCube()
 	glVertex3f(0.5f, 0.5f, 0.5f);
 	
 	// bottom
+	glNormal3f(0.0f, -0.97f, 0.0f);
 	glColor3b(255, 0, 0);
 	glVertex3f(-0.5f, -0.5f, -0.5f);
 	glColor3b(0, 255, 0);
@@ -169,23 +160,25 @@ void drawCube()
 	glVertex3f(0.5f, -0.5f, -0.5f);
 	
 	// right
-	glColor3b(255, 0, 0);
+	glNormal3f(0.97f, 0.0f, 0.0f);
+	GFX_TEX_COORD = (16 << 20); // lower left coordinate
 	glVertex3f(0.5f, -0.5f, 0.5f);
-	glColor3b(0, 255, 0);
+	GFX_TEX_COORD = 0;	// top felt coordinate
 	glVertex3f(0.5f, 0.5f, 0.5f);
-	glColor3b(0, 0, 255);
+	GFX_TEX_COORD = (16 << 4); // top right coordinate
 	glVertex3f(0.5f, 0.5f, -0.5f);
-	glColor3b(0, 255, 0);
+	GFX_TEX_COORD = ((16 << 4) | (16 << 20)); // lower right coordinate
 	glVertex3f(0.5f, -0.5f, -0.5f);
 	
 	// left
-	glColor3b(255, 0, 0);
+	glNormal3f(-0.97f, 0.0f, 0.0f);
+	GFX_TEX_COORD = (16 << 20); // lower left coordinate
 	glVertex3f(-0.5f, -0.5f, -0.5f);
-	glColor3b(0, 255, 0);
+	GFX_TEX_COORD = 0;	// top felt coordinate
 	glVertex3f(-0.5f, 0.5f, -0.5f);
-	glColor3b(0, 0, 255);
+	GFX_TEX_COORD = (16 << 4); // top right coordinate
 	glVertex3f(-0.5f, 0.5f, 0.5f);
-	glColor3b(0, 255, 0);
+	GFX_TEX_COORD = ((16 << 4) | (16 << 20)); // lower right coordinate
 	glVertex3f(-0.5f, -0.5f, 0.5f);
 
 	GFX_END = 1;
