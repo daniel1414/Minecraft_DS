@@ -3,19 +3,16 @@
 
 #include <nds.h>
 
-
-typedef struct world_positionf32
-{
-    int x, y, z; // fixed point format 20.12
-} world_positionf32;
+#include "My_Types.h"
 
 class Cube
 {
 public:
-    Cube(world_positionf32 position, int textures[3]);
+    Cube(vec3f32 position, int textures[3]);
+    void draw(vec3f32* camera_position, vec3f32* camera_front, vec3f32* camera_world_up);
     void draw() const;
 private:
-    world_positionf32 m_position;
+    vec3f32 m_position;
     int m_textures[3];
 };
 

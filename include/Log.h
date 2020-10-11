@@ -10,6 +10,7 @@
 #if LOG_ENABLED
 #define LOG(message, ...) Logger::Log(message, __VA_ARGS__)
 #else
+
 #define LOG(message, ...)
 #endif
 

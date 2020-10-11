@@ -6,12 +6,13 @@
 
 #include <vector>
 
-#include "Log.h"
-#include "Cube.h"
-
 #include "grass_side.h"
 #include "grass_top.h"
 #include "grass_bottom.h"
+
+#include "Log.h"
+#include "Cube.h"
+#include "Player.h"
 
 void drawCube(int textures[3]);
 
@@ -46,52 +47,44 @@ int main(void) {
 	glMaterialf(GL_EMISSION, RGB15(31, 31, 31));
 	
 	std::vector<Cube> cubes;
-	//cubes.push_back({{0, 0, floattof32(-3.0f)}, textures});
-	//cubes.push_back({{0, 0, floattof32(-4.0f)}, textures});
+	
+	for(int x = -10; x < 10; x++)
+	{
+		for(int z = -10; z < 10; z++)
+		{
+			cubes.push_back({{inttof32(x), 0, inttof32(z)}, textures});
+		}
+	}
+/* 
 	cubes.push_back({{0, floattof32(2.0f), floattof32(-3.0f)}, textures});
 	cubes.push_back({{0, floattof32(2.0f), floattof32(-4.0f)}, textures});
 	cubes.push_back({{0, floattof32(2.0f), floattof32(-5.0f)}, textures});
 	cubes.push_back({{floattof32(1.0f), floattof32(1.0f), floattof32(-3.0f)}, textures});
 	cubes.push_back({{floattof32(1.0f), floattof32(1.0f), floattof32(-4.0f)}, textures});
-
-	MATRIX_CONTROL = GL_PROJECTION;
-	MATRIX_IDENTITY = 1;	
-
-	float asp = (256.0 / 192.0), fov = 70.0;
-
-	gluPerspective(fov, asp, 0.1f, 30.0f);
-	gluLookAt(0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	cubes.push_back({{0, floattof32(2.0f), floattof32(3.0f)}, textures});
+	cubes.push_back({{0, floattof32(2.0f), floattof32(4.0f)}, textures});
+	cubes.push_back({{floattof32(3.0f), floattof32(2.0f), 0}, textures});
+	cubes.push_back({{floattof32(2.0f), floattof32(2.0f), 0}, textures});
+	cubes.push_back({{floattof32(-3.0f), floattof32(2.0f), 0}, textures});
+	cubes.push_back({{floattof32(-2.0f), floattof32(2.0f), 0}, textures});
+ */
 	
+	float x = 0.0f;
+	Player player;
 
-	s16 hor_angle = 0;
-	s16 ver_angle = 0;
+
 	while(1) {
 
-		for(const auto& c : cubes)
+		player.process_input();
+		
+		for(auto& c : cubes)
 		{
+			player.update_camera();
 			c.draw();
 		}
-
+		
 		GFX_FLUSH = 0;
 
-		scanKeys();
-		int keys = keysHeld();
-		if(keys & KEY_LEFT)
-		{
-			hor_angle += 1;
-		}
-		if(keys & KEY_RIGHT)
-		{
-			hor_angle -= 1;
-		}
-		if(keys & KEY_UP)
-		{
-			ver_angle -= 1;
-		}
-		if(keys & KEY_DOWN)
-		{
-			ver_angle += 1;
-		}
 		swiWaitForVBlank();
 	}
 	return 0;
