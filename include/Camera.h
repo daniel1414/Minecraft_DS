@@ -14,7 +14,7 @@ public:
     inline vec3f32 get_right() const {return m_right;}
     inline vec3f32 get_up() const {return m_up;}
     
-    void update();
+    void update() const;
 private:
     void recalculate_vectors();
 

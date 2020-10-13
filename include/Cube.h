@@ -8,8 +8,10 @@
 class Cube
 {
 public:
+    Cube() = default;
     Cube(vec3f32 position, int textures[3]);
-    void draw(vec3f32* camera_position, vec3f32* camera_front, vec3f32* camera_world_up);
+    void move(vec3f32 destination);
+    void load_textures(int textures[3]);
     void draw() const;
 private:
     vec3f32 m_position;

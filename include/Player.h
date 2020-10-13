@@ -10,7 +10,7 @@ public:
     Player();
     void process_input();
     void get_camera_vectors(vec3f32* position, vec3f32* front, vec3f32* world_up);
-    void update_camera();
+    void update_camera() const;
 private:
 
     vec3f32 m_position;

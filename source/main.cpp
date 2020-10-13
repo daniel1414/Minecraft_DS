@@ -14,7 +14,16 @@
 #include "Cube.h"
 #include "Player.h"
 
-void drawCube(int textures[3]);
+static u16 frames = 0;
+
+void FPSTimerCallback()
+{
+	// timer callback is triggered every second, so the frame count is the fps
+	timerStart(3, ClockDivider_1024, UINT16_MAX - 32728, FPSTimerCallback);
+	LOG("FPS: %u", frames);
+	frames = 0;
+}
+
 
 int main(void) {
 	// initialize the required hardware
@@ -46,45 +55,36 @@ int main(void) {
 	glColorTableEXT(0, 0, grass_bottomPalLen / 2, 0, 0, (u16*)grass_bottomPal);
 	glMaterialf(GL_EMISSION, RGB15(31, 31, 31));
 	
-	std::vector<Cube> cubes;
-	
-	for(int x = -10; x < 10; x++)
+	const int square_width = 10;
+	Cube cubes[square_width * square_width + 1];
+	for(int x = 0; x < square_width; x++)
 	{
-		for(int z = -10; z < 10; z++)
+		for(int z = 0; z < square_width; z++)
 		{
-			cubes.push_back({{inttof32(x), 0, inttof32(z)}, textures});
+			cubes[x * square_width + z].move({inttof32(x), 0, inttof32(-z)});
+			cubes[x * square_width + z].load_textures(textures);
 		}
 	}
-/* 
-	cubes.push_back({{0, floattof32(2.0f), floattof32(-3.0f)}, textures});
-	cubes.push_back({{0, floattof32(2.0f), floattof32(-4.0f)}, textures});
-	cubes.push_back({{0, floattof32(2.0f), floattof32(-5.0f)}, textures});
-	cubes.push_back({{floattof32(1.0f), floattof32(1.0f), floattof32(-3.0f)}, textures});
-	cubes.push_back({{floattof32(1.0f), floattof32(1.0f), floattof32(-4.0f)}, textures});
-	cubes.push_back({{0, floattof32(2.0f), floattof32(3.0f)}, textures});
-	cubes.push_back({{0, floattof32(2.0f), floattof32(4.0f)}, textures});
-	cubes.push_back({{floattof32(3.0f), floattof32(2.0f), 0}, textures});
-	cubes.push_back({{floattof32(2.0f), floattof32(2.0f), 0}, textures});
-	cubes.push_back({{floattof32(-3.0f), floattof32(2.0f), 0}, textures});
-	cubes.push_back({{floattof32(-2.0f), floattof32(2.0f), 0}, textures});
- */
-	
-	float x = 0.0f;
+	cubes[square_width * square_width].move({0, inttof32(1), 0});
+	cubes[square_width * square_width].load_textures(textures);
+
 	Player player;
 
+	FPSTimerCallback();
 
 	while(1) {
 
 		player.process_input();
 		
-		for(auto& c : cubes)
+		for(unsigned int i = 0; i < square_width * square_width + 1; i++)
 		{
 			player.update_camera();
-			c.draw();
+			cubes[i].draw();
 		}
 		
 		GFX_FLUSH = 0;
 
+		frames++;
 		swiWaitForVBlank();
 	}
 	return 0;

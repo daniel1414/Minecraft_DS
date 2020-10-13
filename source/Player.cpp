@@ -14,7 +14,7 @@ void Player::process_input()
 {
     scanKeys();
     int keys = keysHeld();
-    int speed = floattof32(0.5f);
+    int speed = floattof32(0.2f);
     if(keys)
     {
         if(keys & KEY_LEFT)
@@ -48,7 +48,7 @@ void Player::get_camera_vectors(vec3f32* position, vec3f32* front, vec3f32* worl
     //LOG("Position in get_camera_vectors: (%d, %d, %d)", p, f, w);
 }
 
-void Player::update_camera()
+void Player::update_camera() const
 {
     m_camera.update();
 }
