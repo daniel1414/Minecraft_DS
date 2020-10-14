@@ -55,13 +55,14 @@ int main(void) {
 	glColorTableEXT(0, 0, grass_bottomPalLen / 2, 0, 0, (u16*)grass_bottomPal);
 	glMaterialf(GL_EMISSION, RGB15(31, 31, 31));
 	
-	const int square_width = 10;
+	const int square_width = 12;
+	const int square_width_half = square_width / 2;
 	Cube cubes[square_width * square_width + 1];
 	for(int x = 0; x < square_width; x++)
 	{
 		for(int z = 0; z < square_width; z++)
 		{
-			cubes[x * square_width + z].move({inttof32(x), 0, inttof32(-z)});
+			cubes[x * square_width + z].move({inttof32(x - square_width_half), 0, inttof32(-z + square_width_half)});
 			cubes[x * square_width + z].load_textures(textures);
 		}
 	}
@@ -76,12 +77,14 @@ int main(void) {
 
 		player.process_input();
 		
+		player.update_camera();
+
 		for(unsigned int i = 0; i < square_width * square_width + 1; i++)
 		{
-			player.update_camera();
 			cubes[i].draw();
 		}
-		
+		MATRIX_POP = 1;
+
 		GFX_FLUSH = 0;
 
 		frames++;

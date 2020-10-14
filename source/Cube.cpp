@@ -25,6 +25,8 @@ void Cube::load_textures(int textures[3])
 
 void Cube::draw() const
 {
+	MATRIX_PUSH = 1;
+
     glTranslatef32(m_position.x, m_position.y, m_position.z);
 
     GFX_POLY_FORMAT = POLY_ALPHA(31) | POLY_CULL_FRONT;

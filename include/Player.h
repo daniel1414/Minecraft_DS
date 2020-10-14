@@ -9,13 +9,15 @@ class Player
 public:
     Player();
     void process_input();
-    void get_camera_vectors(vec3f32* position, vec3f32* front, vec3f32* world_up);
+
     void update_camera() const;
 private:
 
     vec3f32 m_position;
     Camera m_camera;
-    float m_camera_height; // 20.12 fixed point
+    int m_camera_height; 
+
+    touchPosition m_last_touch;
 };
 
 #endif /* _PLAYER_H_ */

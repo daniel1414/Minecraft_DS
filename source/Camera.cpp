@@ -6,12 +6,13 @@
 #include "Log.h"
 
 Camera::Camera() : m_front({0, 0, floattof32(-0.97)}), m_right({floattof32(0.97f), 0, 0}), m_up({0, floattof32(0.97f), 0}),
-    m_position({0, 0, floattof32(2.0f)}), m_world_up({0, floattof32(0.97f), 0}), m_yaw(0), m_pitch(90)
+    m_position({0, 0, floattof32(2.0f)}), m_world_up({0, floattof32(0.97f), 0}), m_yaw(degreesToAngle(-90)), m_pitch(degreesToAngle(0)),
+    m_touch_sensitivity(50.0f)
 {
     MATRIX_CONTROL = GL_PROJECTION;
     glLoadIdentity();
     gluPerspective(70, (256.0f / 192.0f), 0.1, 40);
-
+    recalculate_vectors();
     //LOG("Camera position initialized! (%d, %d, %d)", m_position.x >> 12, m_position.y >> 12, m_position.z >> 12);
 }
 
@@ -27,17 +28,37 @@ void Camera::movef32(int x, int y, int z)
 void Camera::movef32(vec3f32 position)
 {
     m_position = position;
+    //recalculate_vectors();
+}
+
+void Camera::rotate(s16 pxoffset, s16 pyoffset)
+{
+    m_yaw -= (int)(pxoffset * m_touch_sensitivity);
+    m_pitch += (int)(pyoffset * m_touch_sensitivity);
+
+    if(m_pitch > degreesToAngle(54))
+    {
+        m_pitch = degreesToAngle(54);
+    }
+    else if(m_pitch < degreesToAngle(-54))
+    {
+        m_pitch = degreesToAngle(-54);
+    }
     recalculate_vectors();
 }
 
-void Camera::get_vectors(vec3f32* position, vec3f32* front, vec3f32* world_up)
+void Camera::update() const
 {
-    //LOG("position in get_vectors(%d, %d, %d)", position->x, position->y, position->z);
-    position = &m_position;
-    front = &m_front;
-    world_up = &m_world_up;
-    //LOG("position in get_vectors(%d, %d, %d)", position->x >> 12, position->y >> 12, position->z >> 12);
+    MATRIX_CONTROL = GL_MODELVIEW;
+    MATRIX_PUSH = 1;
+    //MATRIX_IDENTITY = 1;
+    gluLookAtf32(   m_position.x, m_position.y, m_position.z,
+                    m_position.x + m_front.x, m_position.y + m_front.y, m_position.z + m_front.z,
+                    m_world_up.x, m_world_up.y, m_world_up.z);
+
+    //LOG("Camera pos: (%d, %d, %d)", m_position.x >> 12, m_position.y >> 12, m_position.z >> 12);
 }
+
 
 // private functions
 
@@ -45,9 +66,9 @@ void Camera::recalculate_vectors()
 {
     vec3f32 front = {0, 0, 0};
     // recalculate the front vector
-    front.x = cosLerp(degreesToAngle(m_yaw * 3.14 / 180)) * cosLerp(degreesToAngle(m_pitch * 3.14 / 180));
-    front.y = sinLerp(degreesToAngle(m_pitch * 3.14 / 180));
-    front.z = sinLerp(degreesToAngle(m_yaw * 3.14 / 180)) * cosLerp(degreesToAngle(m_pitch * 3.14 / 180));
+    front.x = cosLerp(degreesToAngle(m_yaw) * 3.14 / 180) * cosLerp(degreesToAngle(m_pitch) * 3.14 / 180);
+    front.y = sinLerp(degreesToAngle(m_pitch) * 3.14 / 180);
+    front.z = sinLerp(degreesToAngle(m_yaw) * 3.14 / 180) * cosLerp(degreesToAngle(m_pitch) * 3.14 / 180);
     //LOG("front 1: (%d, %d, %d)", front.x, front.y, front.z);
     // fix the fixed notation
     front.x = floattof32(fixedToFloat(front.x, 24));
@@ -72,14 +93,3 @@ void Camera::recalculate_vectors()
     
 }
 
-void Camera::update() const
-{
-    MATRIX_CONTROL = GL_MODELVIEW;
-    MATRIX_PUSH = 1;
-    //MATRIX_IDENTITY = 1;
-    gluLookAtf32(   m_position.x, m_position.y, m_position.z,
-                    m_position.x + m_front.x, m_position.y + m_front.y, m_position.z + m_front.z,
-                    m_world_up.x, m_world_up.y, m_world_up.z);
-
-    //LOG("Camera pos: (%d, %d, %d)", m_position.x >> 12, m_position.y >> 12, m_position.z >> 12);
-}

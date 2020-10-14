@@ -6,7 +6,7 @@
 
 #include "Log.h"
 
-Player::Player() : m_position({0, 0, floattof32(2.0f)}), m_camera_height(floattof32(1.5f))
+Player::Player() : m_position({0, floattof32(1.0f), floattof32(2.0f)}), m_camera_height(floattof32(1.5f))
 {
     m_camera.movef32(m_position.x, m_position.y + m_camera_height, m_position.z);
 }
@@ -37,15 +37,35 @@ void Player::process_input()
             m_position.x -= mulf32(m_camera.get_front().x, speed);
             m_position.z -= mulf32(m_camera.get_front().z, speed);
         }
+        if(keys & KEY_L)
+        {
+            m_position.y -= 0.5 * speed;
+        }
+        if(keys & KEY_R)
+        {
+            m_position.y += 0.5 * speed;
+        }
         m_camera.movef32(m_position.x, m_position.y + m_camera_height, m_position.z);
     }
-}
-
-void Player::get_camera_vectors(vec3f32* position, vec3f32* front, vec3f32* world_up)
-{
-    m_camera.get_vectors(position, front, world_up);
-    LOG("Position in get_camera_vectors: (%d, %d, %d)", position->x >> 12, position->y >> 12, position->z >> 12);
-    //LOG("Position in get_camera_vectors: (%d, %d, %d)", p, f, w);
+    touchPosition touch;
+    touchRead(&touch);
+    if(touch.px || touch.py)
+    {
+        if(m_last_touch.px == 0 || m_last_touch.py == 0)
+        {
+            m_last_touch = touch;
+        } 
+        else
+        {
+            s16 pxoffset = touch.px - m_last_touch.px;
+            s16 pyoffset = touch.py - m_last_touch.py;
+            m_last_touch = touch;
+            m_camera.rotate(pxoffset, pyoffset);
+        }
+        LOG("Touch: (%u, %u)", touch.px, touch.py);
+    } else {
+        m_last_touch = {0, 0, 0, 0, 0, 0};
+    }
 }
 
 void Player::update_camera() const
