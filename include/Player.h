@@ -11,6 +11,8 @@ public:
     void process_input();
 
     void update_camera() const;
+
+    inline vec3f32 get_position() const { return m_position; }
 private:
 
     vec3f32 m_position;

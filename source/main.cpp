@@ -55,9 +55,9 @@ int main(void) {
 	glColorTableEXT(0, 0, grass_bottomPalLen / 2, 0, 0, (u16*)grass_bottomPal);
 	glMaterialf(GL_EMISSION, RGB15(31, 31, 31));
 	
-	const int square_width = 12;
+	const int square_width = 50;
 	const int square_width_half = square_width / 2;
-	Cube cubes[square_width * square_width + 1];
+	Cube* cubes = (Cube*)malloc(square_width * square_width * sizeof(Cube));
 	for(int x = 0; x < square_width; x++)
 	{
 		for(int z = 0; z < square_width; z++)
@@ -81,7 +81,7 @@ int main(void) {
 
 		for(unsigned int i = 0; i < square_width * square_width + 1; i++)
 		{
-			cubes[i].draw();
+			cubes[i].draw_face(CUBE_TOP);
 		}
 		MATRIX_POP = 1;
 
@@ -90,6 +90,7 @@ int main(void) {
 		frames++;
 		swiWaitForVBlank();
 	}
+	free(cubes);
 	return 0;
 }
 
