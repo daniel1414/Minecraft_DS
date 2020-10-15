@@ -8,11 +8,13 @@ class Player
 {
 public:
     Player();
-    void process_input();
+    void init_camera();
 
+    void process_input();
     void update_camera() const;
 
-    inline vec3f32 get_position() const { return m_position; }
+    inline const vec3f32& get_position() const { return m_position; }
+    inline const vec3f32& get_camera_front() const { return m_camera.get_front(); }
 private:
 
     vec3f32 m_position;

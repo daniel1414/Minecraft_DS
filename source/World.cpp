@@ -26,7 +26,7 @@ void World::generate_terrain(int* textures)
 	}
 }
 
-void World::render_cubes() const
+void World::render_cubes(const vec3f32& player_position, const vec3f32& player_direction) const
 {
     for(unsigned int i = 0; i < m_width * m_width; i++)
     {

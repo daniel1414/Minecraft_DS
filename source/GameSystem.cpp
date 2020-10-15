@@ -1,6 +1,10 @@
 #include "GameSystem.h"
 
-#include "nds/arm9/videoGL.h"
+#include <nds.h>
+#include <nds/arm9/video.h>
+#include <nds/arm9/videoGL.h>
+#include <nds/arm9/background.h>
+#include <nds/arm9/input.h>
 
 #include "Log.h"
 
@@ -14,9 +18,10 @@ u8 GameSystem::m_frames = 0;
 GameSystem::GameSystem()
 {
     init_hardware();
-    FPSTimerCallback();
     load_textures();
     m_world.generate_terrain(m_textures);
+	m_player.init_camera();
+    FPSTimerCallback();
 }
 
 GameSystem::~GameSystem()
@@ -26,12 +31,14 @@ GameSystem::~GameSystem()
 
 void GameSystem::run()
 {
-    while(1) {
+    while(1)
+    {
 		m_frames++;
 
 		m_player.process_input();
+
 		m_player.update_camera();
-        m_world.render_cubes();
+        m_world.render_cubes(m_player.get_position(), m_player.get_camera_front());
 
 		MATRIX_POP = 1;
 

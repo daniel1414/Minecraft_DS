@@ -12,10 +12,9 @@ public:
     ~World();
 
     void generate_terrain(int* textures);
-    void render_cubes() const;
+    void render_cubes(const vec3f32& player_position, const vec3f32& player_direction) const;
 
 private:
-    Player m_player;
     Cube* m_cubes;
     u16 m_width = 50;
 };

@@ -4,7 +4,7 @@
 #include "nds.h"
 
 #include "World.h"
-
+#include "Player.h"
 
 class GameSystem
 {
@@ -12,7 +12,7 @@ public:
     GameSystem();
     ~GameSystem();
     void run();
-
+    int* get_textures() const {return m_textures;}
 private:
     static void FPSTimerCallback();
     // initialization functions
@@ -22,8 +22,8 @@ private:
 private:
     World m_world;
     Player m_player;
-    int* m_textures;
     static u8 m_frames;
+    int* m_textures;
 };
 
 #endif

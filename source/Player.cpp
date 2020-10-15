@@ -10,6 +10,12 @@ Player::Player() : m_position({0, floattof32(1.0f), floattof32(2.0f)}), m_camera
 {
     m_camera.movef32(m_position.x, m_position.y + m_camera_height, m_position.z);
 }
+
+void Player::init_camera()
+{
+    m_camera.init();
+}
+
 void Player::process_input()
 {
     scanKeys();

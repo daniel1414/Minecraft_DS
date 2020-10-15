@@ -9,11 +9,15 @@ Camera::Camera() : m_front({0, 0, floattof32(-0.97)}), m_right({floattof32(0.97f
     m_position({0, 0, floattof32(2.0f)}), m_world_up({0, floattof32(0.97f), 0}), m_yaw(degreesToAngle(-90)), m_pitch(degreesToAngle(0)),
     m_touch_sensitivity(50.0f)
 {
+
+}
+
+void Camera::init()
+{
     MATRIX_CONTROL = GL_PROJECTION;
     glLoadIdentity();
     gluPerspective(70, (256.0f / 192.0f), 0.1, 40);
     recalculate_vectors();
-    //LOG("Camera position initialized! (%d, %d, %d)", m_position.x >> 12, m_position.y >> 12, m_position.z >> 12);
 }
 
 void Camera::movef32(int x, int y, int z)

@@ -9,14 +9,15 @@ class Camera
 {
 public:
     Camera();
+    void init();
+
     void movef32(int x, int y, int z);
     void movef32(vec3f32 position);
     
     void rotate(s16 pxoffset, s16 pyoffset);
-
     void update() const;
 
-    inline vec3f32 get_front() const {return m_front;}
+    inline const vec3f32& get_front() const {return m_front;}
     inline vec3f32 get_right() const {return m_right;}
     inline vec3f32 get_up() const {return m_up;}
     
