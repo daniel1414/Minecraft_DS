@@ -5,6 +5,15 @@
 
 #include "World.h"
 #include "Player.h"
+#include "Menu.h"
+
+enum GAME_STATES
+{
+    MENU,
+    GAMEPLAY,
+    PAUSE,
+    EXIT
+};
 
 class GameSystem
 {
@@ -12,18 +21,23 @@ public:
     GameSystem();
     ~GameSystem();
     void run();
-    int* get_textures() const {return m_textures;}
+
 private:
-    static void FPSTimerCallback();
+    void process_input();
     // initialization functions
+    void init_menu();
     void init_hardware();
     void load_textures();
+    static void FPSTimerCallback();
 
+    void deinit_hardware();
 private:
     World m_world;
     Player m_player;
     static u8 m_frames;
     int* m_textures;
+    GAME_STATES m_state;
+    Menu m_menu;
 };
 
 #endif
