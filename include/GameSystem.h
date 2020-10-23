@@ -11,7 +11,6 @@ enum GAME_STATES
 {
     MENU,
     GAMEPLAY,
-    PAUSE,
     EXIT
 };
 
@@ -25,7 +24,6 @@ public:
 private:
     void process_input();
     // initialization functions
-    void init_menu();
     void init_hardware();
     void load_textures();
     static void FPSTimerCallback();

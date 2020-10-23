@@ -3,25 +3,34 @@
 #include <nds.h>
 #include <nds/arm9/input.h>
 #include <nds/arm9/videoGL.h>
+#include <nds/arm9/background.h>
 
 #include "Log.h"
 
-Player::Player() : m_position({0, floattof32(1.0f), floattof32(2.0f)}), m_camera_height(floattof32(1.5f)), m_state(WALKING)
+Player::Player() : m_position({0, floattof32(1.0f), floattof32(2.0f)}), m_camera_height(floattof32(1.5f))
 {
-    m_camera.movef32(m_position.x, m_position.y + m_camera_height, m_position.z);
 }
 
-void Player::init_camera()
+void Player::init()
 {
     m_camera.init();
+    m_camera.movef32(m_position.x, m_position.y + m_camera_height, m_position.z);
+
+    m_pause_bg_sub = bgInitSub(2, BgType_Bmp8, BgSize_B8_256x256, 0, 0);
+    dmaCopy(player_pause_optionsBitmap, bgGetGfxPtr(m_pause_bg_sub), player_pause_optionsBitmapLen);
+    dmaCopy(player_pause_optionsPal, BG_PALETTE_SUB, player_pause_optionsPalLen);
 }
 
-bool Player::process_input(int keys, const touchPosition& touch)
+void Player::process_input(int keys, const touchPosition& touch)
 {
     process_key_input(keys);
-    bool return_to_main_menu = process_touch_input(touch);
+    process_touch_input(touch);
+}
 
-    return return_to_main_menu;
+void Player::start_playing()
+{
+    m_return_status = PLAYER_RETURN_NO_RETURN;
+    m_state = PLAYER_STATE_WALKING;
 }
 
 void Player::update_camera() const
@@ -34,7 +43,7 @@ void Player::process_key_input(int keys)
     int speed = floattof32(0.2f);
     switch(m_state)
     {
-        case WALKING: // while just walking
+        case PLAYER_STATE_WALKING: // while just walking
         {
             if(keys)
             {
@@ -66,16 +75,24 @@ void Player::process_key_input(int keys)
                 {
                     m_position.y += 0.5 * speed;
                 }
+                if(keys & KEY_START)
+                {
+                    m_state = PLAYER_STATE_PAUSE;
+                    load_pause();
+                }
                 m_camera.movef32(m_position.x, m_position.y + m_camera_height, m_position.z);
             }
             break;
         }
-        case EQUIPMENT:
+        case PLAYER_STATE_EQUIPMENT:
         {
-
             break;
         }
-        case CRAFTING:
+        case PLAYER_STATE_CRAFTING:
+        {
+            break;
+        }
+        case PLAYER_STATE_PAUSE:
         {
             break;
         }
@@ -85,12 +102,11 @@ void Player::process_key_input(int keys)
 
 }
 
-bool Player::process_touch_input(const touchPosition& touch)
+void Player::process_touch_input(const touchPosition& touch)
 {
-    bool return_to_main_menu = false;
     switch(m_state)
     {
-        case WALKING:
+        case PLAYER_STATE_WALKING:
         {
             if(touch.px || touch.py)
             {
@@ -111,17 +127,50 @@ bool Player::process_touch_input(const touchPosition& touch)
             }
             break;
         }
-        case EQUIPMENT:
+        case PLAYER_STATE_EQUIPMENT:
         {
             break;
         }
-        case CRAFTING:
+        case PLAYER_STATE_CRAFTING:
         {
+            break;
+        }
+        case PLAYER_STATE_PAUSE:
+        {
+            if(touch.px > 48 && touch.px < 208 && touch.py > 32 && touch.py < 64)
+            {
+                m_state = PLAYER_STATE_WALKING;
+                close_pause();
+            }
+            if(touch.px > 48 && touch.px < 208 && touch.py > 80 && touch.py < 112)
+            {
+                m_return_status = PLAYER_RETURN_MENU;
+                close_pause();
+            }
+            if(touch.px > 48 && touch.px < 208 && touch.py > 128 && touch.py < 160)
+            {
+                m_return_status = PLAYER_RETURN_EXIT;
+            }
             break;
         }
         default:
             break;
     }
+}
 
-    return return_to_main_menu;
+void Player::load_pause()
+{
+    // lcd main on top
+    lcdMainOnTop();
+    dmaCopy(player_pause_optionsBitmap, bgGetGfxPtr(m_pause_bg_sub), player_pause_optionsBitmapLen);
+    dmaCopy(player_pause_optionsPal, BG_PALETTE_SUB, player_pause_optionsPalLen);
+
+    videoBgEnableSub(2);
+}
+
+void Player::close_pause()
+{
+    // lcd main on bottom
+    lcdMainOnBottom();
+    videoBgDisableSub(2);
 }

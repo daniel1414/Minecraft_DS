@@ -24,7 +24,7 @@ BUILD    := build
 SOURCES  := source
 INCLUDES := include
 DATA     :=
-GRAPHICS := gfx gfx/TexturePacks/TextureClassic gfx/Menu
+GRAPHICS := gfx gfx/TexturePacks/TextureClassic gfx/Menu gfx/Gameplay
 AUDIO    :=
 ICON     :=
 

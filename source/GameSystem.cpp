@@ -5,6 +5,7 @@
 #include <nds/arm9/videoGL.h>
 #include <nds/arm9/background.h>
 #include <nds/arm9/input.h>
+#include <nds/system.h>
 
 #include "Log.h"
 
@@ -24,11 +25,12 @@ GameSystem::GameSystem()
     init_hardware();
     load_textures();
     m_world.generate_terrain(m_textures);
-	m_player.init_camera();
+	m_player.init();
     FPSTimerCallback();
 
 	m_state = MENU;
-	init_menu();
+	m_menu.init();
+	m_menu.show();
 }
 
 GameSystem::~GameSystem()
@@ -55,28 +57,41 @@ void GameSystem::run()
 			{
 				m_menu.process_input(keys_down, touch);
 				MENU_RETURN_STATUS status = m_menu.get_return_status();
-				if(status == RETURN_NEW_WORLD)
+				if(status == MENU_RETURN_NEW_WORLD)
 				{
 					m_menu.hide();
 					load_textures();
+					m_player.start_playing();
 					m_state = GAMEPLAY;
+				}
+				else if(status == MENU_RETURN_EXIT)
+				{
+					m_state = EXIT;
 				}
 				break;
 			}
 			case GAMEPLAY:
 			{
 				m_player.process_input(keys_held, touch);
-				m_player.update_camera();
-				m_world.render_cubes(m_player.get_position(), m_player.get_camera_front());
+				PLAYER_RETURN_STATUS status = m_player.get_return_status();
 
-				MATRIX_POP = 1;
-				GFX_FLUSH = 0;
-				break;
-			}
-			case PAUSE:
-			{
-				// change state to either main menu or gameplay
-				// sth like a pause_menu
+				if(status == PLAYER_RETURN_NO_RETURN)
+				{
+					m_player.update_camera();
+					m_world.render_cubes(m_player.get_position(), m_player.get_camera_front());
+
+					MATRIX_POP = 1;
+					GFX_FLUSH = 0;
+				}
+				else if(status == PLAYER_RETURN_MENU)
+				{
+					m_menu.show();
+					m_state = MENU;
+				}
+				else if(status == PLAYER_RETURN_EXIT)
+				{
+					m_state = EXIT;
+				}
 				break;
 			}
 			case EXIT:
@@ -105,17 +120,6 @@ void GameSystem::process_input()
 	} */
 }
 
-void GameSystem::init_menu()
-{
-	vramSetBankA(VRAM_A_MAIN_BG);
-	vramSetBankC(VRAM_C_SUB_BG);
-
-	m_menu.init((void*)main_bgBitmap, main_bgBitmapLen, (void*)main_bgPal, main_bgPalLen,
-		(void*)main_optionsBitmap, main_optionsBitmapLen, (void*)main_optionsPal, main_optionsPalLen);
-
-	m_menu.show();
-}
-
 void GameSystem::init_hardware()
 {
     // initialize the required hardware
@@ -124,7 +128,8 @@ void GameSystem::init_hardware()
 	vramSetBankA(VRAM_A_TEXTURE_SLOT0);
 	vramSetBankC(VRAM_C_SUB_BG);
 	vramSetBankF(VRAM_F_TEX_PALETTE_SLOT0);	
-
+	lcdMainOnBottom();
+	
 	glInit();
 	glEnable(GL_TEXTURE_2D | GL_BLEND);
 
