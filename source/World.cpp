@@ -29,7 +29,7 @@ void World::generate_terrain(int* textures)
             m_cubes[z * m_width + x].move({inttof32(x), inttof32((int)(n * 10)), inttof32(z)});
             m_cubes[z * m_width + x].load_textures(textures);
 
-            offset.x += 0.03;
+            offset.x += 0.05;
             /* for(int z = 0; z < m_width; z++)
             {
                 m_cubes[x * m_width + z].move({inttof32(x - m_width / 2), 0, inttof32(-z + m_width / 2)});
@@ -38,7 +38,7 @@ void World::generate_terrain(int* textures)
 
         }
         offset.x = 0.0;
-        offset.y += 0.03;
+        offset.y += 0.05;
 	}
 }
 

@@ -16,7 +16,6 @@ public:
     static vec2f grad(int x, int y);
     static float noise2D(const vec2f& offset);
 private:
-    static NoiseGenerator* s_NoiseGenerator;
     static float seed[SEED_SIZE];
 };
 

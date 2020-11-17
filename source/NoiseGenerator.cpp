@@ -2,8 +2,7 @@
 
 #include <random>
 
-NoiseGenerator* NoiseGenerator::s_NoiseGenerator = new NoiseGenerator;
-float NoiseGenerator::seed[SEED_SIZE] = {0.3, 0.9, 0.5, 0.3, 0.9, 0.1, 0.1, 0.1, 0.2, 0.4};
+float NoiseGenerator::seed[SEED_SIZE] = {0.3, 0.9, -0.5, -0.3, 0.9, -0.1, 0.1, -0.1, 0.2, 0.4};
 
 float NoiseGenerator::fade(float t)
 {
@@ -22,7 +21,7 @@ float NoiseGenerator::fadeXY(float x, float y)
 
 vec2f NoiseGenerator::grad(int x, int y)
 {
-    return {(x * 12) % SEED_SIZE, (y * 14) % SEED_SIZE};
+    return {NoiseGenerator::seed[(x * 12) % SEED_SIZE], NoiseGenerator::seed[(y * 14) % SEED_SIZE]};
 }
 
 float NoiseGenerator::noise2D(const vec2f& offset)
