@@ -4,8 +4,11 @@
 #include <nds/arm9/input.h>
 #include <nds/arm9/videoGL.h>
 #include <nds/arm9/background.h>
+#include <nds/arm9/sprite.h>
 
 #include "Log.h"
+
+#include "center_cross.h"
 
 Player::Player() : m_position({0, floattof32(1.0f), floattof32(2.0f)}), m_camera_height(floattof32(1.5f))
 {
@@ -13,12 +16,20 @@ Player::Player() : m_position({0, floattof32(1.0f), floattof32(2.0f)}), m_camera
 
 void Player::init()
 {
+    // camera 
     m_camera.init();
     m_camera.movef32(m_position.x, m_position.y + m_camera_height, m_position.z);
 
+    // pause backgroung
     m_pause_bg_sub = bgInitSub(2, BgType_Bmp8, BgSize_B8_256x256, 0, 0);
     dmaCopy(player_pause_optionsBitmap, bgGetGfxPtr(m_pause_bg_sub), player_pause_optionsBitmapLen);
     dmaCopy(player_pause_optionsPal, BG_PALETTE_SUB, player_pause_optionsPalLen);
+    
+    // center cross
+    m_cross_gfx = oamAllocateGfx(&oamMain, SpriteSize_16x16, SpriteColorFormat_16Color);
+    dmaCopy(center_crossTiles, m_cross_gfx, center_crossTilesLen);
+    dmaCopy(center_crossPal, SPRITE_PALETTE, center_crossPalLen);
+    oamSet(&oamMain, 0, 120, 88, 0, 0, SpriteSize_16x16, SpriteColorFormat_16Color, m_cross_gfx, -1, false, true, false, false, false);
 }
 
 void Player::process_input(int keys, const touchPosition& touch)
@@ -29,6 +40,7 @@ void Player::process_input(int keys, const touchPosition& touch)
 
 void Player::start_playing()
 {
+    oamSet(&oamMain, 0, 120, 88, 0, 0, SpriteSize_16x16, SpriteColorFormat_16Color, m_cross_gfx, -1, false, false, false, false, false);
     m_return_status = PLAYER_RETURN_NO_RETURN;
     m_state = PLAYER_STATE_WALKING;
 }
@@ -99,7 +111,6 @@ void Player::process_key_input(int keys)
         default:
             break;
     }
-
 }
 
 void Player::process_touch_input(const touchPosition& touch)
@@ -137,18 +148,20 @@ void Player::process_touch_input(const touchPosition& touch)
         }
         case PLAYER_STATE_PAUSE:
         {
-            if(touch.px > 48 && touch.px < 208 && touch.py > 32 && touch.py < 64)
+            if(touch.px > 48 && touch.px < 208 && touch.py > 32 && touch.py < 64) // resume
             {
                 m_state = PLAYER_STATE_WALKING;
                 close_pause();
             }
-            if(touch.px > 48 && touch.px < 208 && touch.py > 80 && touch.py < 112)
+            if(touch.px > 48 && touch.px < 208 && touch.py > 80 && touch.py < 112) // return to menu
             {
+                oamSetHidden(&oamMain, 0, true);
                 m_return_status = PLAYER_RETURN_MENU;
                 close_pause();
             }
             if(touch.px > 48 && touch.px < 208 && touch.py > 128 && touch.py < 160)
             {
+                oamSetHidden(&oamMain, 0, true);
                 m_return_status = PLAYER_RETURN_EXIT;
             }
             break;

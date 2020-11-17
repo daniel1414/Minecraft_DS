@@ -6,6 +6,7 @@
 #include <nds/arm9/background.h>
 #include <nds/arm9/input.h>
 #include <nds/system.h>
+#include <nds/arm9/sprite.h>
 
 #include "Log.h"
 
@@ -100,24 +101,9 @@ void GameSystem::run()
 				return;
 			}
 		}
+		oamUpdate(&oamMain);
 		swiWaitForVBlank();
 	}
-}
-
-void GameSystem::process_input()
-{
-	/* scanKeys();
-    int keys = keysHeld();
-	touchPosition touch;
-    touchRead(&touch);
-	if(m_state == GAMEPLAY)
-	{
-		if(m_player.process_input(keys, touch))
-		{
-			m_state = MENU;
-			init_menu();
-		}
-	} */
 }
 
 void GameSystem::init_hardware()
@@ -126,8 +112,11 @@ void GameSystem::init_hardware()
 	videoSetMode(MODE_5_3D);
 	videoSetModeSub(MODE_5_2D);
 	vramSetBankA(VRAM_A_TEXTURE_SLOT0);
+	vramSetBankB(VRAM_B_MAIN_SPRITE);
 	vramSetBankC(VRAM_C_SUB_BG);
 	vramSetBankF(VRAM_F_TEX_PALETTE_SLOT0);	
+	oamInit(&oamMain, SpriteMapping_1D_32, false);
+	
 	lcdMainOnBottom();
 	
 	glInit();

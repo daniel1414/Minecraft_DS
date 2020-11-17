@@ -62,6 +62,7 @@ public:
                     }
                     case 'f':
                     {
+                        ss.precision(5);
                         double f = va_arg(args, double);
                         ss << f;
                         break;

@@ -1,10 +1,12 @@
 #ifndef _PLAYER_H_
 #define _PLAYER_H_
 
-#include "player_pause_options.h"
+#include <nds.h>
 
 #include "My_Types.h"
 #include "Camera.h"
+
+#include "player_pause_options.h"
 
 enum PLAYER_STATE
 {
@@ -30,7 +32,7 @@ public:
     void process_input(int keys, const touchPosition& touch);
     void process_key_input(int keys);
     void process_touch_input(const touchPosition& touch);
-    
+
     void update_camera() const;
     void start_playing();
     void load_pause();
@@ -50,6 +52,7 @@ private:
     PLAYER_RETURN_STATUS m_return_status = PLAYER_RETURN_NO_RETURN;
 
     int m_pause_bg_sub;
+    u16* m_cross_gfx;
 };
 
 #endif /* _PLAYER_H_ */

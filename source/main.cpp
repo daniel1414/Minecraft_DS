@@ -1,15 +1,11 @@
 #include "GameSystem.h"
 
-/* void FPSTimerCallback()
-{
-	// timer callback is triggered every second, so the frame count is the fps
-	timerStart(3, ClockDivider_1024, UINT16_MAX - 32728, FPSTimerCallback);
-	LOG("FPS: %u", frames);
-	frames = 0;
-}
- */
+#include "Log.h"
+#include "My_Types.h"
+#include "NoiseGenerator.h"
 
 int main(void) {
+
 	GameSystem system;
 	system.run();
 

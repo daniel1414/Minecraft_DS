@@ -22,7 +22,6 @@ public:
     void run();
 
 private:
-    void process_input();
     // initialization functions
     void init_hardware();
     void load_textures();

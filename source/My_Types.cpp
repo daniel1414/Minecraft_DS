@@ -32,3 +32,8 @@ vec3f32 cross_vec3f32(const vec3f32& a, const vec3f32& b)
 	result.z = mulf32(a.x, b.y) - mulf32(b.x, a.y);
     return result;
 }
+
+float dot_vec2f(const vec2f& a, const vec2f& b)
+{
+	return a.x * b.x + a.y * b.y;
+}

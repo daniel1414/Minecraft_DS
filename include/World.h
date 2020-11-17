@@ -16,7 +16,7 @@ public:
 
 private:
     Cube* m_cubes;
-    u16 m_width = 50;
+    u16 m_width = 14;
 };
 
 #endif /* _WORLD_H_ */
