@@ -55,7 +55,7 @@ int main(void) {
 
 	glMaterialf(GL_EMISSION, RGB15(31, 31, 31));
 
-	mainCamera =  new PerspectiveCamera({inttof32(0), inttof32(CHUNK_SIZE_Y + 2), inttof32(3)}, 60, floattof32(256.0f / 192.0f), floattof32(0.1f), inttof32(20));
+	mainCamera =  new PerspectiveCamera({inttof32(0), inttof32(2), inttof32(3)}, 60, floattof32(256.0f / 192.0f), floattof32(0.1f), inttof32(20));
 
 	SpriteAttributes centerCrossAttr = {"centerCross", 256 / 2, 192 / 2, (void*)center_crossTiles, center_crossTilesLen, (void*)center_crossPal, center_crossPalLen, SpriteSize_16x16};
 	Sprite* center_cross = Sprite::create(centerCrossAttr);

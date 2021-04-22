@@ -2,8 +2,8 @@
 
 #include "Cube.h"
 
-#define WORLD_SIZE_X    4 /* in chunks */
-#define WORLD_SIZE_Z    4 /* in chunks */
+#define WORLD_SIZE_X    2 /* in chunks */
+#define WORLD_SIZE_Z    2 /* in chunks */
 
 #define CHUNK_SIZE_X    8
 #define CHUNK_SIZE_Z    8
