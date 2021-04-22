@@ -1,33 +1,60 @@
-#ifndef _CUBE_H_
-#define _CUBE_H_
+#pragma once
 
-#include <nds.h>
+#include "Renderer.h"
 
-#include "My_Types.h"
+#define CUBE_SIZE (int32)inttof32(1)
+#define CUBE_SIZE_HALF (int32)floattof32(0.5f)
+#define CUBE_RADIUS (int32)floattof32(0.8f)
+#define TEXTURE_SIZE 16
+
+#define CUBE_TYPE_COUNT 3
+
+#define CUBE_TYPE_OFFSET_AIR 0
+#define CUBE_TYPE_OFFSET_GRASS 1
+#define CUBE_TYPE_OFFSET_DIRT 2
 
 enum CUBE_FACES
 {
-    CUBE_TOP,
-    CUBE_FRONT,
-    CUBE_RIGHT,
-    CUBE_BACK,
-    CUBE_LEFT,
-    CUBE_BOTTOM
+    CUBE_FACE_BOTTOM = 0,
+    CUBE_FACE_FRONT,
+    CUBE_FACE_RIGHT,
+    CUBE_FACE_BACK,
+    CUBE_FACE_LEFT,
+    CUBE_FACE_TOP,
+    CUBE_FACE_NONE
+};
+
+enum CUBE_TEXTURE_COORDS
+{
+    CUBE_TEXCOORD_BOTTOM,
+    CUBE_TEXCOORD_SIDE,
+    CUBE_TEXCOORD_TOP
 };
 
 class Cube
 {
 public:
-    Cube() = default;
-    Cube(vec3f32 position, int textures[3]);
-    void move(vec3f32 destination);
-    void shift(vec3f32 direction);
-    void load_textures(int* textures);
-    void draw_face(CUBE_FACES face) const;
-    void draw() const;
+    Cube(Vec2 texCoords[], bool faceOpacities[]);
+    
+    void drawFace(const Vec3& position, CUBE_FACES face) const;
+    void draw(const Vec3& position) const;
+
+    bool isOpaque(CUBE_FACES face) const { return m_faceOpaque[face]; }
 private:
-    vec3f32 m_position;
-    int* m_textures; // 3 textures - top, side, bottom
+    Vec2 m_texCoords[3]; // according to CUBE_TEXTURE_COORDS
+    bool m_faceOpaque[7]; // according to CUBE_FACES enum
+    // add some other stuff according to every cube in the universe
 };
 
-#endif /* _CUBE_H_ */
+struct CubeNode
+{
+    CubeNode();
+    CubeNode(const Vec3& Position);
+
+    CubeNode* next = nullptr;
+    Cube* cube = nullptr;
+    Vec3 position;
+    CUBE_FACES visibleFaces[6];
+private:
+    void init();
+};

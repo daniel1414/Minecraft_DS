@@ -5,18 +5,18 @@
 
 #include <nds.h>
 
-#include "My_Types.h"
+#include <nds/arm9/math.h>
 
 class NoiseGenerator
 {
 public:
-    static float fade(float t);
-    static float fadeXY(const vec2f& offset);
-    static float fadeXY(float x, float y);
-    static vec2f grad(int x, int y);
-    static float noise2D(const vec2f& offset);
+    static int32 fade(int32 t);
+    static int32 fadeXY(const Vec2& offset);
+    static int32 fadeXY(int32 x, int32 y);
+    static Vec2 grad(int x, int y);
+    static int32 noise2D(const Vec2& offset);
 private:
-    static float seed[SEED_SIZE];
+    static int32 seed[SEED_SIZE];
 };
 
 #endif /* _NOISE_GENERATOR_H_ */

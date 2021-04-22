@@ -1,149 +1,78 @@
 #include "Cube.h"
 
-#include <nds/arm9/video.h>
-#include <nds/arm9/videoGL.h>
-
-#include "Log.h"
-
-Cube::Cube(vec3f32 position, int textures[3]) : m_position(position)
+Cube::Cube(Vec2 texCoords[], bool faceOpacities[])
 {
-    load_textures(textures);
-}
-
-void Cube::move(vec3f32 destination)
-{
-	m_position = destination;
-}
-
-void Cube::shift(vec3f32 direction)
-{
-	m_position += direction;
-}
-
-void Cube::load_textures(int* textures)
-{
-	for(int i = 0; i < 3; i++)
+    for(int i = 0; i < 3; ++i)
     {
-        m_textures[i] = textures[i];
+        m_texCoords[i] = texCoords[i];
+    }
+
+    for(int i = 0; i < 7; ++i)
+    {
+        m_faceOpaque[i] = faceOpacities[i];
     }
 }
 
-void Cube::draw_face(CUBE_FACES face) const
+void Cube::drawFace(const Vec3& position, CUBE_FACES face) const
 {
-	MATRIX_PUSH = 1;
-
-	glTranslatef32(m_position.x, m_position.y, m_position.z);
-    GFX_POLY_FORMAT = POLY_ALPHA(31) | POLY_CULL_FRONT;
-    GFX_BEGIN = GL_QUADS;
-
-	switch(face)
-	{
-		case CUBE_TOP:
-			glBindTexture(0, m_textures[1]);
-			glNormal3f(0.0f, 0.97f, 0.0f);
-			glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.5f, 0.5f, 0.5f);
-			glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f, 0.5f, -0.5f);
-			glTexCoord2f(1.0f, 0.0f); glVertex3f(0.5f, 0.5f, -0.5f);
-			glTexCoord2f(1.0f, 1.0f); glVertex3f(0.5f, 0.5f, 0.5f);
-		break;
-		case CUBE_FRONT:
-			glBindTexture(0, m_textures[0]);
-			glNormal3f(0.0f, 0.0f, 0.97f);
-			glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.5f, -0.5, 0.5f);
-			glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f, 0.5f, 0.5f);
-			glTexCoord2f(1.0f, 0.0f); glVertex3f(0.5f, 0.5f, 0.5f);
-			glTexCoord2f(1.0f, 1.0f); glVertex3f(0.5f, -0.5f, 0.5f);
-		break;
-		case CUBE_RIGHT:
-			glBindTexture(0, m_textures[0]);
-			glNormal3f(0.97f, 0.0f, 0.0f); 
-			glTexCoord2f(0.0f, 1.0f); glVertex3f(0.5f, -0.5f, 0.5f);
-			glTexCoord2f(0.0f, 0.0f); glVertex3f(0.5f,  0.5f, 0.5f);
-			glTexCoord2f(1.0f, 0.0f); glVertex3f(0.5f, 0.5f, -0.5f);
-			glTexCoord2f(1.0f, 1.0f); glVertex3f(0.5f,-0.5f, -0.5f);	
-		break;
-		case CUBE_BACK:
-			glBindTexture(0, m_textures[0]);
-			glNormal3f(0.0f, 0.0f, -0.97f);
-			glTexCoord2f(0.0f, 1.0f); glVertex3f(0.5f, -0.5f, -0.5f);
-			glTexCoord2f(0.0f, 0.0f); glVertex3f(0.5f, 0.5f, -0.5f);
-			glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.5f, 0.5f, -0.5f);
-			glTexCoord2f(1.0f, 1.0f); glVertex3f(-0.5f, -0.5f, -0.5f);	
-		break;
-		case CUBE_LEFT:
-			glBindTexture(0, m_textures[0]);
-			glNormal3f(-0.97f, 0.0f, 0.0f);
-			glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.5f, -0.5f, -0.5f);
-			glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f, 0.5f, -0.5f);
-			glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.5f, 0.5f, 0.5f);
-			glTexCoord2f(1.0f, 1.0f); glVertex3f(-0.5f, -0.5f, 0.5f);	
-		break;
-		case CUBE_BOTTOM:
-			glBindTexture(0, m_textures[2]);
-			glNormal3f(0.0f, -0.97f, 0.0f);
-			glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.5f, -0.5f, -0.5f);
-			glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f, -0.5f, 0.5f);
-			glTexCoord2f(1.0f, 0.0f); glVertex3f(0.5f, -0.5f, 0.5f);
-			glTexCoord2f(1.0f, 1.0f); glVertex3f(0.5f, -0.5f, -0.5f);
-		break;
-		default:
-		break;
-	}
-	GFX_END = 1;
-	MATRIX_POP = 1;
+    switch(face)
+    {
+        case CUBE_FACE_BOTTOM:
+            Renderer::drawQuad({position.x, position.y, position.z}, {CUBE_SIZE, CUBE_SIZE, CUBE_SIZE}, m_texCoords[CUBE_TEXCOORD_BOTTOM], {TEXTURE_SIZE, TEXTURE_SIZE}, {0, -1, 0});
+            break;
+        case CUBE_FACE_FRONT:
+            Renderer::drawQuad({position.x, position.y, position.z + CUBE_SIZE}, {CUBE_SIZE, CUBE_SIZE, CUBE_SIZE}, m_texCoords[CUBE_TEXCOORD_SIDE], {TEXTURE_SIZE, TEXTURE_SIZE}, {0, 0, 1});
+            break;
+        case CUBE_FACE_RIGHT:
+            Renderer::drawQuad({position.x + CUBE_SIZE, position.y, position.z}, {CUBE_SIZE, CUBE_SIZE, CUBE_SIZE}, m_texCoords[CUBE_TEXCOORD_SIDE], {TEXTURE_SIZE, TEXTURE_SIZE}, {1, 0, 0});
+            break;
+        case CUBE_FACE_BACK:
+            Renderer::drawQuad({position.x, position.y, position.z}, {CUBE_SIZE, CUBE_SIZE, CUBE_SIZE}, m_texCoords[CUBE_TEXCOORD_SIDE], {TEXTURE_SIZE, TEXTURE_SIZE}, {0, 0, -1});
+            break;
+        case CUBE_FACE_LEFT:
+            Renderer::drawQuad({position.x, position.y, position.z}, {CUBE_SIZE, CUBE_SIZE, CUBE_SIZE}, m_texCoords[CUBE_TEXCOORD_SIDE], {TEXTURE_SIZE, TEXTURE_SIZE}, {-1, 0, 0});
+            break;
+        case CUBE_FACE_TOP:
+            Renderer::drawQuad({position.x, position.y + CUBE_SIZE, position.z}, {CUBE_SIZE, CUBE_SIZE, CUBE_SIZE}, m_texCoords[CUBE_TEXCOORD_TOP], {TEXTURE_SIZE, TEXTURE_SIZE}, {0, 1, 0});
+            break;
+        case CUBE_FACE_NONE:
+            break;
+        default:
+            LOG("Invalid Cube face!", 0);
+            break;
+    }
 }
 
-void Cube::draw() const
+void Cube::draw(const Vec3& position) const
 {
-	MATRIX_PUSH = 1;
+    // bottom face
+    drawFace(position, CUBE_FACE_BOTTOM);
+    // front
+    drawFace(position, CUBE_FACE_FRONT);
+    // right
+    drawFace(position, CUBE_FACE_RIGHT);
+    // back
+    drawFace(position, CUBE_FACE_BACK);
+    // left
+    drawFace(position, CUBE_FACE_LEFT);
+    // top face
+    drawFace(position, CUBE_FACE_TOP);
+}
 
-    glTranslatef32(m_position.x, m_position.y, m_position.z);
+CubeNode::CubeNode() : position({0, inttof32(-1), 0})
+{
+    init();
+}
 
-    GFX_POLY_FORMAT = POLY_ALPHA(31) | POLY_CULL_FRONT;
+CubeNode::CubeNode(const Vec3& Position) : position(Position)
+{
+    init();
+}
 
-    GFX_BEGIN = GL_QUADS;
-	// front
-	glBindTexture(0, m_textures[0]);
-	glNormal3f(0.0f, 0.0f, 0.97f);
-    
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.5f, -0.5, 0.5f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f, 0.5f, 0.5f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(0.5f, 0.5f, 0.5f);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(0.5f, -0.5f, 0.5f);
-	// right
-	glNormal3f(0.97f, 0.0f, 0.0f); 
-    glTexCoord2f(0.0f, 1.0f); glVertex3f(0.5f, -0.5f, 0.5f);
-    glTexCoord2f(0.0f, 0.0f); glVertex3f(0.5f,  0.5f, 0.5f);
-    glTexCoord2f(1.0f, 0.0f); glVertex3f(0.5f, 0.5f, -0.5f);
-    glTexCoord2f(1.0f, 1.0f); glVertex3f(0.5f,-0.5f, -0.5f);	
-	// back
-	glNormal3f(0.0f, 0.0f, -0.97f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(0.5f, -0.5f, -0.5f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(0.5f, 0.5f, -0.5f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.5f, 0.5f, -0.5f);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(-0.5f, -0.5f, -0.5f);	
-	// left
-	glNormal3f(-0.97f, 0.0f, 0.0f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.5f, -0.5f, -0.5f);
-    glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f, 0.5f, -0.5f);
-    glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.5f, 0.5f, 0.5f);
-    glTexCoord2f(1.0f, 1.0f); glVertex3f(-0.5f, -0.5f, 0.5f);
-	// top
-	glBindTexture(0, m_textures[1]);
-	glNormal3f(0.0f, 0.97f, 0.0f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.5f, 0.5f, 0.5f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f, 0.5f, -0.5f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(0.5f, 0.5f, -0.5f);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(0.5f, 0.5f, 0.5f);
-	// bottom
-	glBindTexture(0, m_textures[2]);
-	glNormal3f(0.0f, -0.97f, 0.0f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.5f, -0.5f, -0.5f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f, -0.5f, 0.5f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(0.5f, -0.5f, 0.5f);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(0.5f, -0.5f, -0.5f);
-
-	GFX_END = 1;
-
-    MATRIX_POP = 1;	
+void CubeNode::init()
+{
+    for(int i = 0; i < 6; ++i)
+    {
+        visibleFaces[i] = CUBE_FACE_NONE;
+    }
 }

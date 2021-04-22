@@ -1,9 +1,10 @@
-#ifndef _WORLD_H_
-#define _WORLD_H_
+#pragma once
 
-#include "nds.h"
-#include "Player.h"
-#include "Cube.h"
+#include <nds.h>
+
+#include "Chunk.h"
+
+#define VISIBLE_CHUNK_DISTANCE 4
 
 class World
 {
@@ -11,12 +12,16 @@ public:
     World();
     ~World();
 
-    void generate_terrain(int* textures);
-    void render_cubes(const vec3f32& player_position, const vec3f32& player_direction) const;
+    //void generate_terrain(int* textures);
+
+    void destroyCube(const Vec3& cameraPosition, const Vec3& cameraDirection);
+
+    void drawTerrain(Camera* camera) const;
+private:
+    Cube* m_cubeInstances[CUBE_TYPE_COUNT];
+    Chunk* m_chunks[WORLD_SIZE_Z * WORLD_SIZE_X];
 
 private:
-    Cube* m_cubes;
-    u16 m_width = 50;
+    void loadCubeInformation();
+    void initChunks();
 };
-
-#endif /* _WORLD_H_ */
