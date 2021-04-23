@@ -141,6 +141,9 @@ void World::loadCubeInformation()
     /* dirt cube */
     textureCoords = {Vec2{0, 0}, Vec2{0, 0}, Vec2{0, 0}};
     m_cubeInstances[CUBE_TYPE_OFFSET_DIRT] = new Cube(textureCoords, faceOpacities);
+    /* stone cube */
+    textureCoords = {Vec2{48, 0}, Vec2{48, 0}, Vec2{48, 0}};
+    m_cubeInstances[CUBE_TYPE_OFFSET_STONE] = new Cube(textureCoords, faceOpacities);
 
     /* add cubes and their properties here */
 }

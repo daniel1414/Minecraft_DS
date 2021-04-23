@@ -28,9 +28,9 @@ Vec2 NoiseGenerator::grad(int x, int y)
 int32 NoiseGenerator::noise2D(const Vec2& offset)
 {
     int32 x0 = ((offset.x >> 12) << 12);
-    int32 x1 = (((x0 >> 12) + 1) % SEED_SIZE << 12);
+    int32 x1 = ((((x0 >> 12) + 1) % SEED_SIZE) << 12);
     int32 y0 = ((offset.y >> 12) << 12);
-    int32 y1 = (((y0 >> 12) + 1) % SEED_SIZE << 12);
+    int32 y1 = ((((y0 >> 12) + 1) % SEED_SIZE) << 12);
     
     int32 xx = offset.x - x0;
     int32 yy = offset.y - y0;

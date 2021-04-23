@@ -2,12 +2,12 @@
 
 #include "Cube.h"
 
-#define WORLD_SIZE_X    2 /* in chunks */
-#define WORLD_SIZE_Z    2 /* in chunks */
+#define WORLD_SIZE_X    4 /* in chunks */
+#define WORLD_SIZE_Z    4 /* in chunks */
 
-#define CHUNK_SIZE_X    8
-#define CHUNK_SIZE_Z    8
-#define CHUNK_SIZE_Y    32
+#define CHUNK_SIZE_X    6
+#define CHUNK_SIZE_Z    6
+#define CHUNK_SIZE_Y    16
 
 #define CUBE_DESTRUCTION_RADIUS inttof32(5)
 

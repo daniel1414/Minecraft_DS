@@ -7,11 +7,12 @@
 #define CUBE_RADIUS (int32)floattof32(0.8f)
 #define TEXTURE_SIZE 16
 
-#define CUBE_TYPE_COUNT 3
+#define CUBE_TYPE_COUNT 4
 
 #define CUBE_TYPE_OFFSET_AIR 0
 #define CUBE_TYPE_OFFSET_GRASS 1
 #define CUBE_TYPE_OFFSET_DIRT 2
+#define CUBE_TYPE_OFFSET_STONE 3
 
 enum CUBE_FACES
 {

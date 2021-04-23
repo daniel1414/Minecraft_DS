@@ -195,18 +195,18 @@ void Chunk::init()
     }
 
     int32 step = floattof32(0.01f);
-    Vec2 offset = {mulf32(m_position.x + ((WORLD_SIZE_X / 2 * CHUNK_SIZE_X) << 12), mulf32(step, inttof32(CHUNK_SIZE_X))),
-        mulf32(m_position.y + ((WORLD_SIZE_Z / 2 * CHUNK_SIZE_Z) << 12), mulf32(step, inttof32(CHUNK_SIZE_Z)))};
+    Vec2 offset = {mulf32(divf32(m_position.x + inttof32(WORLD_SIZE_X / 2 * CHUNK_SIZE_X), inttof32(CHUNK_SIZE_X)), mulf32(inttof32(8), step)),
+        mulf32(divf32(m_position.y + inttof32(WORLD_SIZE_Z / 2 * CHUNK_SIZE_Z), inttof32(CHUNK_SIZE_Z)), mulf32(inttof32(8), step)),};
 
     for(int z = 0; z < CHUNK_SIZE_Z; ++z)
     {
         for(int x = 0; x < CHUNK_SIZE_X; ++x)
         {
             int32 y = NoiseGenerator::noise2D(offset);
-            m_cubes[(mulf32(y, inttof32(1)) >> 12) * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_GRASS];
+            m_cubes[(mulf32(y, floattof32(0.5f)) >> 12) * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_STONE];
             offset.x += step;
         }
-        offset.x = mulf32(m_position.x + ((WORLD_SIZE_X / 2 * CHUNK_SIZE_X) << 12), mulf32(step, inttof32(CHUNK_SIZE_X)));
+        offset.x = mulf32(divf32(m_position.x + inttof32(WORLD_SIZE_X / 2 * CHUNK_SIZE_X), inttof32(CHUNK_SIZE_X)), mulf32(inttof32(8), step));
         offset.y += step;
     }
     
