@@ -46,27 +46,6 @@ World::~World()
     }
 }
 
-/* void World::generate_terrain(int* textures)
-{
-    // the top-most layer
-    vec2f offset = {0.0, 0.0};
-    for(int z = 0; z < m_width; z++)
-	{
-        for(int x = 0; x < m_width; x++)
-        {
-            float n = NoiseGenerator::noise2D(offset);
-            Logger::Log("noise in (%d, %d) = %f", x, z, n);
-            m_cubes[z * m_width + x].move({inttof32(x), inttof32((int)(n * 10)), inttof32(z)});
-            m_cubes[z * m_width + x].load_textures(textures);
-
-            offset.x += 0.05;
-
-        }
-        offset.x = 0.0;
-        offset.y += 0.05;
-	}
-} */
-
 void World::destroyCube(const Vec3& cameraPosition, const Vec3& cameraDirection)
 {
     Vec3 chunkIndex = {((cameraPosition.x >> 12) + (WORLD_SIZE_X / 2) * CHUNK_SIZE_X) / CHUNK_SIZE_X, 0, ((cameraPosition.z >> 12) + (WORLD_SIZE_Z / 2) * CHUNK_SIZE_Z) / CHUNK_SIZE_Z};

@@ -230,20 +230,25 @@ void Chunk::init()
         for(int x = 0; x < CHUNK_SIZE_X; ++x)
         {
             int32 y = NoiseGenerator::noise2D(offset);
-            m_cubes[(mulf32(y, floattof32(0.5f)) >> 12) * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_STONE];
+            m_cubes[(mulf32(y, inttof32(2)) >> 12) * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_GRASS];
             offset.x += step;
         }
         offset.x = mulf32(divf32(m_position.x + inttof32(WORLD_SIZE_X / 2 * CHUNK_SIZE_X), inttof32(CHUNK_SIZE_X)), mulf32(inttof32(8), step));
         offset.y += step;
     }
     
-    for(int y = CHUNK_SIZE_Y - 1; y < CHUNK_SIZE_Y; ++y)
+    for(int y = CHUNK_SIZE_Y - 2; y > -1 ; --y)
     {
-        for(int z = 0; z < CHUNK_SIZE_Z; ++z)
+        for(int z = CHUNK_SIZE_Z - 1; z > -1; --z)
         {
-            for(int x = 0; x < CHUNK_SIZE_X; ++x)
+            for(int x = CHUNK_SIZE_X; x > -1; --x)
             {
-                m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_AIR];
+                if(m_cubes[(y + 1) * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] == m_cubeInstances[CUBE_TYPE_OFFSET_GRASS]
+                        || m_cubes[(y + 2) * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] == m_cubeInstances[CUBE_TYPE_OFFSET_GRASS])
+                    m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_DIRT];
+                if(m_cubes[(y + 1) * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] == m_cubeInstances[CUBE_TYPE_OFFSET_DIRT]
+                        || m_cubes[(y + 1) * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] == m_cubeInstances[CUBE_TYPE_OFFSET_STONE])
+                    m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_STONE];
             }
         }
     }
