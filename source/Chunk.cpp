@@ -38,7 +38,7 @@ void Chunk::updateDrawList()
                             head->cube = m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x];
                             head->next = new CubeNode();
                         }
-                        head->visibleFaces[0] = CUBE_FACE_BOTTOM;
+                        head->visibleFaces =  (head->visibleFaces | 1);
                     }
                     // check front (z + 1)
                     if((z == CHUNK_SIZE_Z - 1 && ((m_position.y >> 12) + CHUNK_SIZE_Z < WORLD_SIZE_Z * CHUNK_SIZE_Z / 2)
@@ -51,7 +51,7 @@ void Chunk::updateDrawList()
                             head->cube = m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x];
                             head->next = new CubeNode();
                         }
-                        head->visibleFaces[1] = CUBE_FACE_FRONT;
+                        head->visibleFaces =  (head->visibleFaces | (1 << 1));
                     }
                     // check right (x + 1)
                     if((x == CHUNK_SIZE_X - 1 && ((m_position.x >> 12) + CHUNK_SIZE_X < WORLD_SIZE_X * CHUNK_SIZE_X / 2)
@@ -64,7 +64,7 @@ void Chunk::updateDrawList()
                             head->cube = m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x];
                             head->next = new CubeNode();
                         }
-                        head->visibleFaces[2] = CUBE_FACE_RIGHT;
+                        head->visibleFaces = (head->visibleFaces | (1 << 2));
                     }
                     // check back
                     if((z == 0 && ((m_position.y >> 12) + (WORLD_SIZE_X / 2) * CHUNK_SIZE_Z > 0)
@@ -77,7 +77,7 @@ void Chunk::updateDrawList()
                             head->cube = m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x];
                             head->next = new CubeNode();
                         }
-                        head->visibleFaces[3] = CUBE_FACE_BACK;
+                        head->visibleFaces = (head->visibleFaces | (1 << 3));
                     }
                     // check left
                     if((x == 0 && ((m_position.x >> 12) + (WORLD_SIZE_X / 2) * CHUNK_SIZE_X > 0)
@@ -90,7 +90,7 @@ void Chunk::updateDrawList()
                             head->cube = m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x];
                             head->next = new CubeNode();
                         }
-                        head->visibleFaces[4] = CUBE_FACE_LEFT;
+                        head->visibleFaces = (head->visibleFaces |(1 << 4));
                     }
                     // check top
                     if(y == CHUNK_SIZE_Y - 1
@@ -102,7 +102,7 @@ void Chunk::updateDrawList()
                             head->cube = m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x];
                             head->next = new CubeNode();
                         }
-                        head->visibleFaces[5] = CUBE_FACE_TOP;
+                        head->visibleFaces = (head->visibleFaces | (1 << 5));
                     }
 
                     if(head->next != nullptr)
@@ -166,14 +166,41 @@ bool Chunk::destroyCube(const Vec3& cameraPosition, const Vec3& cameraFront, int
     return result;
 }
 
-void Chunk::draw() const
+void Chunk::draw(Camera* camera) const
 {
+    const Vec3& camPosition = camera->getPosition();
     CubeNode* head = m_visibleCubes;
     while(head->next != nullptr)
     {
-        for(int i = 0; i < 6; ++i)
+        if(head->visibleFaces & 1) // bottom
         {
-            head->cube->drawFace(head->position, head->visibleFaces[i]);
+            if(camPosition.y < head->position.y)
+                head->cube->drawFace(head->position, CUBE_FACE_BOTTOM);
+        }
+        if(head->visibleFaces & (1 << 5)) // top
+        {
+            if(camPosition.y > head->position.y + CUBE_SIZE)
+                head->cube->drawFace(head->position, CUBE_FACE_TOP);
+        }
+        if(head->visibleFaces & (1 << 1)) // front
+        {
+            if(camPosition.z > head->position.z + CUBE_SIZE)
+                head->cube->drawFace(head->position, CUBE_FACE_FRONT);
+        }
+        if(head->visibleFaces & (1 << 3)) // back
+        {
+            if(camPosition.z < head->position.z)
+                head->cube->drawFace(head->position, CUBE_FACE_BACK);
+        }
+        if(head->visibleFaces & (1 << 2)) // right
+        {
+            if(camPosition.x > head->position.x + CUBE_SIZE)
+                head->cube->drawFace(head->position, CUBE_FACE_RIGHT);
+        }
+        if(head->visibleFaces & (1 << 4)) // left
+        {
+            if(camPosition.x < head->position.x)
+                head->cube->drawFace(head->position, CUBE_FACE_LEFT);
         }
         head = head->next;
     }
@@ -195,7 +222,7 @@ void Chunk::init()
     }
 
     int32 step = floattof32(0.01f);
-    Vec2 offset = {mulf32(divf32(m_position.x + inttof32(WORLD_SIZE_X / 2 * CHUNK_SIZE_X), inttof32(CHUNK_SIZE_X)), mulf32(inttof32(8), step)),
+    Vec2 offset = {mulf32(divf32((m_position.x >> 12) + inttof32(WORLD_SIZE_X / 2 * CHUNK_SIZE_X), inttof32(CHUNK_SIZE_X)), mulf32(inttof32(8), step)),
         mulf32(divf32(m_position.y + inttof32(WORLD_SIZE_Z / 2 * CHUNK_SIZE_Z), inttof32(CHUNK_SIZE_Z)), mulf32(inttof32(8), step)),};
 
     for(int z = 0; z < CHUNK_SIZE_Z; ++z)
@@ -210,6 +237,17 @@ void Chunk::init()
         offset.y += step;
     }
     
+    for(int y = CHUNK_SIZE_Y - 1; y < CHUNK_SIZE_Y; ++y)
+    {
+        for(int z = 0; z < CHUNK_SIZE_Z; ++z)
+        {
+            for(int x = 0; x < CHUNK_SIZE_X; ++x)
+            {
+                m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_AIR];
+            }
+        }
+    }
+
     m_visibleCubes = new CubeNode();
 
     for(int i = 0; i < 4; ++i)

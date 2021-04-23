@@ -116,7 +116,7 @@ void World::drawTerrain(Camera* camera) const
 
                 if(isInFrustum)
                 {
-                    m_chunks[z * WORLD_SIZE_X + x]->draw();
+                    m_chunks[z * WORLD_SIZE_X + x]->draw(camera);
                 }
             }
         }

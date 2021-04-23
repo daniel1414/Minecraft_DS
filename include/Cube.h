@@ -55,7 +55,7 @@ struct CubeNode
     CubeNode* next = nullptr;
     Cube* cube = nullptr;
     Vec3 position;
-    CUBE_FACES visibleFaces[6];
+    uint8 visibleFaces = 0; // LSB - bottom, MSB - top
 private:
     void init();
 };

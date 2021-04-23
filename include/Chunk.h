@@ -5,8 +5,8 @@
 #define WORLD_SIZE_X    4 /* in chunks */
 #define WORLD_SIZE_Z    4 /* in chunks */
 
-#define CHUNK_SIZE_X    6
-#define CHUNK_SIZE_Z    6
+#define CHUNK_SIZE_X    8
+#define CHUNK_SIZE_Z    8
 #define CHUNK_SIZE_Y    16
 
 #define CUBE_DESTRUCTION_RADIUS inttof32(5)
@@ -31,7 +31,7 @@ public:
     bool destroyCube(const Vec3& cameraPosition, const Vec3& cameraFront, int32 distance);
     
     //void draw(Camera* camera) const;
-    void draw() const;
+    void draw(Camera* camera) const;
 
     const Cube** getCubes() { return (const Cube**)m_cubes; }
     void setNeighbour(CHUNK_SIDE side, Chunk* chunk) { m_sideChunks[side] = chunk; }

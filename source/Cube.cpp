@@ -61,18 +61,8 @@ void Cube::draw(const Vec3& position) const
 
 CubeNode::CubeNode() : position({0, inttof32(-1), 0})
 {
-    init();
 }
 
 CubeNode::CubeNode(const Vec3& Position) : position(Position)
 {
-    init();
-}
-
-void CubeNode::init()
-{
-    for(int i = 0; i < 6; ++i)
-    {
-        visibleFaces[i] = CUBE_FACE_NONE;
-    }
 }
