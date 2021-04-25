@@ -59,11 +59,6 @@ int main(void) {
 	SpriteAttributes centerCrossAttr = {"centerCross", 256 / 2, 192 / 2, (void*)center_crossTiles, center_crossTilesLen, (void*)center_crossPal, center_crossPalLen, SpriteSize_16x16};
 	Sprite* center_cross = Sprite::create(centerCrossAttr);
 
-/* 	Vec3 pos = {inttof32(1), 0, inttof32(-1)};
-	Vec3 pos2 = {inttof32(2), inttof32(-1), 0};
-	pos2 += pos;
-	LOG("(%x, %x, %x)", pos2.x, pos2.y, pos2.z); */
-
 	world = new World();
 
 	while(1) {
@@ -78,7 +73,6 @@ int main(void) {
 		if(keysH)
 		{
 			mainCamera->processKeyInput(keysH, floattof32(0.1f));
-			//chunks[0]->updateDrawList(mainCamera->getPosition());
 		}
 		if(keysD & KEY_A)
 		{
@@ -88,9 +82,6 @@ int main(void) {
 		touchPosition touchPos;
 		touchRead(&touchPos);
 		mainCamera->processTouchInput(touchPos);
-
-		//bool inFrustum = mainCamera->isInFrustum((Vec3*)&cube->getPosition(), floattof32(0.86f));
-		//iprintf("\x1b[2;1HinFrustum: %d", inFrustum);
 
 		// rendering
 		Renderer::beginScene();

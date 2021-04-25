@@ -10,8 +10,6 @@ public:
     World();
     ~World();
 
-    //void generate_terrain(int* textures);
-
     void destroyCube(const Vec3& cameraPosition, const Vec3& cameraDirection);
 
     void drawTerrain(Camera* camera) const;

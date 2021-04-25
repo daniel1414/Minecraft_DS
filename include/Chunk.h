@@ -2,14 +2,14 @@
 
 #include "Cube.h"
 
-#define WORLD_SIZE_X    14 /* in chunks */
-#define WORLD_SIZE_Z    14 /* in chunks */
+#define WORLD_SIZE_X    12 /* in chunks */
+#define WORLD_SIZE_Z    12 /* in chunks */
 
-#define CHUNK_SIZE_X    4
-#define CHUNK_SIZE_Z    4
+#define CHUNK_SIZE_X    6
+#define CHUNK_SIZE_Z    6
 #define CHUNK_SIZE_Y    32
 
-#define VISIBLE_CHUNK_DISTANCE 5
+#define VISIBLE_CHUNK_DISTANCE 4
 #define CUBE_DESTRUCTION_RADIUS inttof32(5)
 
 enum CHUNK_SIDE
