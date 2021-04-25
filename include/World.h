@@ -4,8 +4,6 @@
 
 #include "Chunk.h"
 
-#define VISIBLE_CHUNK_DISTANCE 3
-
 class World
 {
 public:

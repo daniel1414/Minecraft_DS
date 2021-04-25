@@ -23,7 +23,7 @@ int grass_texture;
 
 World* world = nullptr;
 
-bool cullFrustum = true;
+bool cullFrustum = false;
 
 int main(void) {
 
