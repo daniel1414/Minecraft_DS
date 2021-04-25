@@ -230,7 +230,6 @@ void Chunk::init()
         for(int x = 0; x < CHUNK_SIZE_X; ++x)
         {
             int32 y = NoiseGenerator::noise2D(offset);
-            LOG("y = %x", y);
             m_cubes[((mulf32(y, inttof32(2)) >> 12) + 15) * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_GRASS];
             offset.x += step;
         }
