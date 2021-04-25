@@ -11,6 +11,7 @@
 #include "center_cross.h"
 
 #include "Log.h"
+#include "NoiseGenerator.h"
 #include "Renderer.h"
 #include "Sprite.h"
 #include "World.h"
@@ -53,7 +54,7 @@ int main(void) {
 
 	glMaterialf(GL_EMISSION, RGB15(31, 31, 31));
 
-	mainCamera =  new PerspectiveCamera({inttof32(0), inttof32(CHUNK_SIZE_Y), inttof32(3)}, 60, floattof32(256.0f / 192.0f), floattof32(0.1f), inttof32(20));
+	mainCamera =  new PerspectiveCamera({inttof32(0), inttof32(CHUNK_SIZE_Y), inttof32(3)}, 60, floattof32(256.0f / 192.0f), floattof32(0.1f), inttof32(50));
 
 	SpriteAttributes centerCrossAttr = {"centerCross", 256 / 2, 192 / 2, (void*)center_crossTiles, center_crossTilesLen, (void*)center_crossPal, center_crossPalLen, SpriteSize_16x16};
 	Sprite* center_cross = Sprite::create(centerCrossAttr);
@@ -62,7 +63,27 @@ int main(void) {
 	Vec3 pos2 = {inttof32(2), inttof32(-1), 0};
 	pos2 += pos;
 	LOG("(%x, %x, %x)", pos2.x, pos2.y, pos2.z); */
-	
+	#include <limits.h>
+	int32 max = 0;
+	int32 min = INT_MAX;
+	Vec2 offset = {0, 0};
+	int32 step = floattof32(0.01f);
+	for(int y = 0; y < 100; y++)
+	{
+		for(int x = 0; x < 101; x++)
+		{
+			int noise = (NoiseGenerator::noise2D(offset) >> 12);
+			if(noise < min)
+				min = noise;
+			if(noise > max)
+				max = noise;
+			offset.x += step;
+		}
+		offset.x = 0;
+		offset.y += step;
+	}
+	LOG("min = %d, max = %d", min, max);
+
 	world = new World();
 
 	while(1) {
