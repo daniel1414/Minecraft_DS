@@ -38,10 +38,11 @@ int main(void) {
 
 	glInit();
 
-	glEnable(GL_BLEND | GL_ANTIALIAS | GL_TEXTURE_2D);
+	glEnable(GL_BLEND | GL_ANTIALIAS | GL_TEXTURE_2D | GL_FOG);
 	Renderer::init();
 	
 	glClearColor(3, 3, 3, 31);
+	glFogColor(25, 25, 25, 31);
 	glClearPolyID(63);
 	glClearDepth(GL_MAX_DEPTH);
 
@@ -60,6 +61,8 @@ int main(void) {
 	Sprite* center_cross = Sprite::create(centerCrossAttr);
 
 	world = new World();
+
+	world->plantOakTree({0, inttof32(CHUNK_SIZE_Y - 8), 0});
 
 	while(1) {
 

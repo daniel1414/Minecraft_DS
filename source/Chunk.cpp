@@ -13,6 +13,172 @@ Chunk::~Chunk()
     deleteDrawList();
 }
 
+void Chunk::plantOakTree(const Vec3& position)
+{
+    Vec3 blockIndex = {((m_position.x - position.x) >> 12), position.y >> 12, ((m_position.y - position.z) >> 12)};    
+    int stage = 0;
+    for(int y = blockIndex.y + TREE_HEIGHT; y > blockIndex.y + TREE_HEIGHT - 3; --y)
+    {
+        for(int z = blockIndex.z - stage; z < blockIndex.z + stage + 1; ++z)
+        {
+            for(int x = blockIndex.x - stage; x < blockIndex.x + stage + 1; ++x)
+            {
+                if(z < 0)
+                {
+                    if(x < 0)
+                    {
+                        m_sideChunks[CHUNK_SIDE_BACK_LEFT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (CHUNK_SIZE_Z + z) * CHUNK_SIZE_X + (CHUNK_SIZE_X + x)] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
+                        m_sideChunks[CHUNK_SIDE_BACK_LEFT]->updateDrawList();
+                    } 
+                    else if(x > CHUNK_SIZE_X - 1)
+                    {
+                        m_sideChunks[CHUNK_SIDE_BACK_RIGHT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (CHUNK_SIZE_Z + z) * CHUNK_SIZE_X + (x % CHUNK_SIZE_X)] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
+                        m_sideChunks[CHUNK_SIDE_BACK_RIGHT]->updateDrawList();
+                    }
+                    else
+                    {
+                        m_sideChunks[CHUNK_SIDE_BACK]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (CHUNK_SIZE_Z + z) * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
+                        m_sideChunks[CHUNK_SIDE_BACK]->updateDrawList();
+                    }
+                }
+                else if(z > CHUNK_SIZE_Z - 1)
+                {
+                    if(x < 0)
+                    {
+                        m_sideChunks[CHUNK_SIDE_FRONT_LEFT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (z % CHUNK_SIZE_Z) * CHUNK_SIZE_X + (CHUNK_SIZE_X + x)] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
+                        m_sideChunks[CHUNK_SIDE_FRONT_LEFT]->updateDrawList();
+                    } 
+                    else if(x > CHUNK_SIZE_X - 1)
+                    {
+                        m_sideChunks[CHUNK_SIDE_FRONT_RIGHT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (z % CHUNK_SIZE_Z) * CHUNK_SIZE_X + (x % CHUNK_SIZE_X)] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
+                        m_sideChunks[CHUNK_SIDE_FRONT_RIGHT]->updateDrawList();
+                    }
+                    else
+                    {
+                        m_sideChunks[CHUNK_SIDE_FRONT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (z % CHUNK_SIZE_Z) * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
+                        m_sideChunks[CHUNK_SIDE_FRONT]->updateDrawList();
+                    }
+                } 
+                else 
+                {
+                    if(x < 0)
+                    {
+                        m_sideChunks[CHUNK_SIDE_LEFT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + (CHUNK_SIZE_X + x)] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
+                        m_sideChunks[CHUNK_SIDE_LEFT]->updateDrawList();
+                    } 
+                    else if(x > CHUNK_SIZE_X - 1)
+                    {
+                        m_sideChunks[CHUNK_SIDE_RIGHT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + (x % CHUNK_SIZE_X)] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
+                        m_sideChunks[CHUNK_SIDE_RIGHT]->updateDrawList();
+                    }
+                    else 
+                    {
+                        m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
+                        updateDrawList();
+                    }
+                }
+            }
+        }
+        stage++;
+    }
+    for(int y = blockIndex.y; (y < CHUNK_SIZE_Y && y < blockIndex.y + TREE_HEIGHT); ++y)
+    {
+        m_cubes[y * CHUNK_SIZE_X * CHUNK_SIZE_Z + blockIndex.z * CHUNK_SIZE_X + blockIndex.x] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_WOOD];
+    }
+    updateDrawList();
+}
+
+bool Chunk::destroyCube(const Vec3& cameraPosition, const Vec3& cameraFront, int32 distance)
+{
+    bool result = false;
+    /* position in the chunk */
+    Vec3 playerPosition = {cameraPosition.x - m_position.x, cameraPosition.y, cameraPosition.z - m_position.y};
+    Vec3 rayPosition = playerPosition;
+    Vec3 step = (Vec3)cameraFront * floattof32(0.05f);
+    Vec3 lastRayPosition = rayPosition;
+    while(!result) // add constraints
+    {
+        if((rayPosition.x >> 12) < 0)
+            return m_sideChunks[CHUNK_SIDE_LEFT]->destroyCube({m_position.x + rayPosition.x, rayPosition.y, m_position.y + rayPosition.z}, cameraFront, distance - Vec3::dist(playerPosition, rayPosition));
+        if((rayPosition.x >> 12) > CHUNK_SIZE_X - 1)
+            return m_sideChunks[CHUNK_SIDE_RIGHT]->destroyCube({m_position.x + rayPosition.x, rayPosition.y, m_position.y + rayPosition.z}, cameraFront, distance - Vec3::dist(playerPosition, rayPosition));
+        if((rayPosition.z >> 12) < 0)
+            return m_sideChunks[CHUNK_SIDE_BACK]->destroyCube({m_position.x + rayPosition.x, rayPosition.y, m_position.y + rayPosition.z}, cameraFront, distance - Vec3::dist(playerPosition, rayPosition));
+        if((rayPosition.z >> 12) > CHUNK_SIZE_Z - 1)
+            return m_sideChunks[CHUNK_SIDE_FRONT]->destroyCube({m_position.x + rayPosition.x, rayPosition.y, m_position.y + rayPosition.z}, cameraFront, distance - Vec3::dist(playerPosition, rayPosition));
+
+        if(((rayPosition.y >> 12) < CHUNK_SIZE_Y && (rayPosition.y >> 12) > -1) &&
+            ((rayPosition.z >> 12) < CHUNK_SIZE_Z && (rayPosition.z >> 12) > -1) && 
+            ((rayPosition.x >> 12) < CHUNK_SIZE_X && (rayPosition.x >> 12) > -1)) // check if position does not exceed the chunk limits
+        {
+            if(!m_cubes[(rayPosition.y >> 12) * CHUNK_SIZE_Z * CHUNK_SIZE_X + (rayPosition.z >> 12) * CHUNK_SIZE_X + (rayPosition.x >> 12)]->isOpaque(CUBE_FACE_NONE))
+            {
+                m_cubes[(rayPosition.y >> 12) * CHUNK_SIZE_Z * CHUNK_SIZE_X + (rayPosition.z >> 12) * CHUNK_SIZE_X + (rayPosition.x >> 12)] = m_cubeInstances[CUBE_TYPE_OFFSET_AIR];
+                result = true;
+                if((rayPosition.x >> 12) == 0)
+                    m_sideChunks[CHUNK_SIDE_LEFT]->updateDrawList();
+                else if((rayPosition.x >> 12 == CHUNK_SIZE_X - 1))
+                    m_sideChunks[CHUNK_SIDE_RIGHT]->updateDrawList();
+                if((rayPosition.z >> 12) == 0)
+                    m_sideChunks[CHUNK_SIDE_BACK]->updateDrawList();
+                else if((rayPosition.z >> 12) == CHUNK_SIZE_Z - 1)
+                    m_sideChunks[CHUNK_SIDE_FRONT]->updateDrawList();
+                updateDrawList();
+            }
+        }
+        while(((rayPosition.x >> 12) == (lastRayPosition.x >> 12)) && ((rayPosition.y >> 12) == (lastRayPosition.y >> 12)) && ((rayPosition.z >> 12) == (lastRayPosition.z >> 12)) && !result)
+        {
+            lastRayPosition = rayPosition;
+            rayPosition += step;
+            if(Vec3::dist(rayPosition, playerPosition) > distance)
+                result = true;
+        }
+        lastRayPosition = rayPosition;
+        
+    }
+    return result;
+}
+
+void Chunk::draw(Camera* camera) const
+{
+    const Vec3& camPosition = camera->getPosition();
+    CubeNode* head = m_visibleCubes;
+    while(head->next != nullptr)
+    {
+        if(head->visibleFaces & 1) // bottom
+        {
+            if(camPosition.y < head->position.y)
+                head->cube->drawFace(head->position, CUBE_FACE_BOTTOM);
+        }
+        if(head->visibleFaces & (1 << 5)) // top
+        {
+            if(camPosition.y > head->position.y + CUBE_SIZE)
+                head->cube->drawFace(head->position, CUBE_FACE_TOP);
+        }
+        if(head->visibleFaces & (1 << 1)) // front
+        {
+            if(camPosition.z > head->position.z + CUBE_SIZE)
+                head->cube->drawFace(head->position, CUBE_FACE_FRONT);
+        }
+        if(head->visibleFaces & (1 << 3)) // back
+        {
+            if(camPosition.z < head->position.z)
+                head->cube->drawFace(head->position, CUBE_FACE_BACK);
+        }
+        if(head->visibleFaces & (1 << 2)) // right
+        {
+            if(camPosition.x > head->position.x + CUBE_SIZE)
+                head->cube->drawFace(head->position, CUBE_FACE_RIGHT);
+        }
+        if(head->visibleFaces & (1 << 4)) // left
+        {
+            if(camPosition.x < head->position.x)
+                head->cube->drawFace(head->position, CUBE_FACE_LEFT);
+        }
+        head = head->next;
+    }
+}
+
 void Chunk::updateDrawList()
 {
     deleteDrawList();
@@ -115,96 +281,9 @@ void Chunk::updateDrawList()
     }
 }
 
-bool Chunk::destroyCube(const Vec3& cameraPosition, const Vec3& cameraFront, int32 distance)
-{
-    bool result = false;
-    /* position in the chunk */
-    Vec3 playerPosition = {cameraPosition.x - m_position.x, cameraPosition.y, cameraPosition.z - m_position.y};
-    Vec3 rayPosition = playerPosition;
-    Vec3 step = (Vec3)cameraFront * floattof32(0.05f);
-    Vec3 lastRayPosition = rayPosition;
-    while(!result) // add constraints
-    {
-        if((rayPosition.x >> 12) < 0)
-            return m_sideChunks[CHUNK_SIDE_LEFT]->destroyCube({m_position.x + rayPosition.x, rayPosition.y, m_position.y + rayPosition.z}, cameraFront, distance - Vec3::dist(playerPosition, rayPosition));
-        if((rayPosition.x >> 12) > CHUNK_SIZE_X - 1)
-            return m_sideChunks[CHUNK_SIDE_RIGHT]->destroyCube({m_position.x + rayPosition.x, rayPosition.y, m_position.y + rayPosition.z}, cameraFront, distance - Vec3::dist(playerPosition, rayPosition));
-        if((rayPosition.z >> 12) < 0)
-            return m_sideChunks[CHUNK_SIDE_BACK]->destroyCube({m_position.x + rayPosition.x, rayPosition.y, m_position.y + rayPosition.z}, cameraFront, distance - Vec3::dist(playerPosition, rayPosition));
-        if((rayPosition.z >> 12) > CHUNK_SIZE_Z - 1)
-            return m_sideChunks[CHUNK_SIDE_FRONT]->destroyCube({m_position.x + rayPosition.x, rayPosition.y, m_position.y + rayPosition.z}, cameraFront, distance - Vec3::dist(playerPosition, rayPosition));
 
-        if(((rayPosition.y >> 12) < CHUNK_SIZE_Y && (rayPosition.y >> 12) > -1) &&
-            ((rayPosition.z >> 12) < CHUNK_SIZE_Z && (rayPosition.z >> 12) > -1) && 
-            ((rayPosition.x >> 12) < CHUNK_SIZE_X && (rayPosition.x >> 12) > -1)) // check if position does not exceed the chunk limits
-        {
-            if(!m_cubes[(rayPosition.y >> 12) * CHUNK_SIZE_Z * CHUNK_SIZE_X + (rayPosition.z >> 12) * CHUNK_SIZE_X + (rayPosition.x >> 12)]->isOpaque(CUBE_FACE_NONE))
-            {
-                m_cubes[(rayPosition.y >> 12) * CHUNK_SIZE_Z * CHUNK_SIZE_X + (rayPosition.z >> 12) * CHUNK_SIZE_X + (rayPosition.x >> 12)] = m_cubeInstances[CUBE_TYPE_OFFSET_AIR];
-                result = true;
-                if((rayPosition.x >> 12) == 0)
-                    m_sideChunks[CHUNK_SIDE_LEFT]->updateDrawList();
-                else if((rayPosition.x >> 12 == CHUNK_SIZE_X - 1))
-                    m_sideChunks[CHUNK_SIDE_RIGHT]->updateDrawList();
-                if((rayPosition.z >> 12) == 0)
-                    m_sideChunks[CHUNK_SIDE_BACK]->updateDrawList();
-                else if((rayPosition.z >> 12) == CHUNK_SIZE_Z - 1)
-                    m_sideChunks[CHUNK_SIDE_FRONT]->updateDrawList();
-                updateDrawList();
-            }
-        }
-        while(((rayPosition.x >> 12) == (lastRayPosition.x >> 12)) && ((rayPosition.y >> 12) == (lastRayPosition.y >> 12)) && ((rayPosition.z >> 12) == (lastRayPosition.z >> 12)) && !result)
-        {
-            lastRayPosition = rayPosition;
-            rayPosition += step;
-            if(Vec3::dist(rayPosition, playerPosition) > distance)
-                result = true;
-        }
-        lastRayPosition = rayPosition;
-        
-    }
-    return result;
-}
 
-void Chunk::draw(Camera* camera) const
-{
-    const Vec3& camPosition = camera->getPosition();
-    CubeNode* head = m_visibleCubes;
-    while(head->next != nullptr)
-    {
-        if(head->visibleFaces & 1) // bottom
-        {
-            if(camPosition.y < head->position.y)
-                head->cube->drawFace(head->position, CUBE_FACE_BOTTOM);
-        }
-        if(head->visibleFaces & (1 << 5)) // top
-        {
-            if(camPosition.y > head->position.y + CUBE_SIZE)
-                head->cube->drawFace(head->position, CUBE_FACE_TOP);
-        }
-        if(head->visibleFaces & (1 << 1)) // front
-        {
-            if(camPosition.z > head->position.z + CUBE_SIZE)
-                head->cube->drawFace(head->position, CUBE_FACE_FRONT);
-        }
-        if(head->visibleFaces & (1 << 3)) // back
-        {
-            if(camPosition.z < head->position.z)
-                head->cube->drawFace(head->position, CUBE_FACE_BACK);
-        }
-        if(head->visibleFaces & (1 << 2)) // right
-        {
-            if(camPosition.x > head->position.x + CUBE_SIZE)
-                head->cube->drawFace(head->position, CUBE_FACE_RIGHT);
-        }
-        if(head->visibleFaces & (1 << 4)) // left
-        {
-            if(camPosition.x < head->position.x)
-                head->cube->drawFace(head->position, CUBE_FACE_LEFT);
-        }
-        head = head->next;
-    }
-}
+
 
 void Chunk::init()
 {

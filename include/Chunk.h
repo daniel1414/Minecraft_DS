@@ -5,12 +5,14 @@
 #define WORLD_SIZE_X    12 /* in chunks */
 #define WORLD_SIZE_Z    12 /* in chunks */
 
-#define CHUNK_SIZE_X    6
-#define CHUNK_SIZE_Z    6
+#define CHUNK_SIZE_X    4
+#define CHUNK_SIZE_Z    4
 #define CHUNK_SIZE_Y    32
 
-#define VISIBLE_CHUNK_DISTANCE 4
+#define VISIBLE_CHUNK_DISTANCE 5
 #define CUBE_DESTRUCTION_RADIUS inttof32(5)
+
+#define TREE_HEIGHT 5
 
 enum CHUNK_SIDE
 {
@@ -18,6 +20,10 @@ enum CHUNK_SIDE
     CHUNK_SIDE_RIGHT,
     CHUNK_SIDE_BACK,
     CHUNK_SIDE_LEFT,
+    CHUNK_SIDE_FRONT_RIGHT,
+    CHUNK_SIDE_BACK_RIGHT,
+    CHUNK_SIDE_BACK_LEFT,
+    CHUNK_SIDE_FRONT_LEFT,
     CHUNK_SIDE_NONE
 };
 
@@ -28,6 +34,7 @@ public:
     Chunk(const Vec2& position, Cube** cubeInstances);
     ~Chunk();
 
+    void plantOakTree(const Vec3& position);
     // returns true if operation is over
     bool destroyCube(const Vec3& cameraPosition, const Vec3& cameraFront, int32 distance);
     
@@ -46,5 +53,5 @@ private:
     // m_cubes contain pointers to the actual cubes
     Cube** m_cubes = nullptr;
     CubeNode* m_visibleCubes = nullptr;
-    Chunk* m_sideChunks[4]; // front(z+), right(x+), back(z-), left(x-)
+    Chunk* m_sideChunks[8]; // front(z+), right(x+), back(z-), left(x-)
 };

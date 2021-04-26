@@ -10,6 +10,8 @@ public:
     World();
     ~World();
 
+    void plantOakTree(const Vec3& position);
+
     void destroyCube(const Vec3& cameraPosition, const Vec3& cameraDirection);
 
     void drawTerrain(Camera* camera) const;

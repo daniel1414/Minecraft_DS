@@ -46,6 +46,12 @@ World::~World()
     }
 }
 
+void World::plantOakTree(const Vec3& position)
+{
+    Vec3 chunkIndex = {((position.x >> 12) + (WORLD_SIZE_X / 2) * CHUNK_SIZE_X) / CHUNK_SIZE_X, 0, ((position.z >> 12) + (WORLD_SIZE_Z / 2) * CHUNK_SIZE_Z) / CHUNK_SIZE_Z};
+    m_chunks[chunkIndex.z * WORLD_SIZE_X + chunkIndex.x]->plantOakTree(position);
+}
+
 void World::destroyCube(const Vec3& cameraPosition, const Vec3& cameraDirection)
 {
     Vec3 chunkIndex = {((cameraPosition.x >> 12) + (WORLD_SIZE_X / 2) * CHUNK_SIZE_X) / CHUNK_SIZE_X, 0, ((cameraPosition.z >> 12) + (WORLD_SIZE_Z / 2) * CHUNK_SIZE_Z) / CHUNK_SIZE_Z};
@@ -117,6 +123,16 @@ void World::loadCubeInformation()
     /* stone cube */
     textureCoords = {Vec2{48, 0}, Vec2{48, 0}, Vec2{48, 0}};
     m_cubeInstances[CUBE_TYPE_OFFSET_STONE] = new Cube(textureCoords, faceOpacities);
+    /* cobblestone cube */
+    textureCoords = {Vec2{64, 0}, Vec2{64, 0}, Vec2{64, 0}};
+    m_cubeInstances[CUBE_TYPE_OFFSET_COBBLESTONE] = new Cube(textureCoords, faceOpacities);
+    /* oak wood cube */
+    textureCoords = {Vec2{80, 0}, Vec2{96, 0}, Vec2{80, 0}};
+    m_cubeInstances[CUBE_TYPE_OFFSET_OAK_WOOD] = new Cube(textureCoords, faceOpacities);
+    /* oak leaves cube */
+    textureCoords = {Vec2{112, 0}, Vec2{112, 0}, Vec2{112, 0}};
+    faceOpacities = {false, false, false, false, false, false, false};
+    m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES] = new Cube(textureCoords, faceOpacities);
 
     /* add cubes and their properties here */
 }
@@ -136,9 +152,21 @@ void World::initChunks()
         for(int x = 0; x < WORLD_SIZE_X; ++x)
         {
             if(z != 0) // add back neighbour
+            {
                 m_chunks[z * WORLD_SIZE_X + x]->setNeighbour(CHUNK_SIDE_BACK, m_chunks[(z - 1) * WORLD_SIZE_X + x]);
+                if(x != 0)
+                    m_chunks[z * WORLD_SIZE_X + x]->setNeighbour(CHUNK_SIDE_BACK_LEFT, m_chunks[(z - 1) * WORLD_SIZE_X + x - 1]);
+                if(x != WORLD_SIZE_X - 1)
+                    m_chunks[z * WORLD_SIZE_X + x]->setNeighbour(CHUNK_SIDE_BACK_RIGHT, m_chunks[(z - 1) * WORLD_SIZE_X + x + 1]);
+            }
             if(z != WORLD_SIZE_Z - 1)
+            {
                 m_chunks[z * WORLD_SIZE_X + x]->setNeighbour(CHUNK_SIDE_FRONT, m_chunks[(z + 1) * WORLD_SIZE_X + x]);
+                if(x != 0)
+                    m_chunks[z * WORLD_SIZE_X + x]->setNeighbour(CHUNK_SIDE_FRONT_LEFT, m_chunks[(z + 1) * WORLD_SIZE_X + x - 1]);
+                if(x != WORLD_SIZE_X - 1)
+                    m_chunks[z * WORLD_SIZE_X + x]->setNeighbour(CHUNK_SIDE_FRONT_RIGHT, m_chunks[(z + 1) * WORLD_SIZE_X + x + 1]);
+            }
             if(x != 0)
                 m_chunks[z * WORLD_SIZE_X + x]->setNeighbour(CHUNK_SIDE_LEFT, m_chunks[z * WORLD_SIZE_X + x - 1]);
             if(x != WORLD_SIZE_X - 1)
