@@ -49,6 +49,7 @@ World::~World()
 void World::plantOakTree(const Vec3& position)
 {
     Vec3 chunkIndex = {((position.x >> 12) + (WORLD_SIZE_X / 2) * CHUNK_SIZE_X) / CHUNK_SIZE_X, 0, ((position.z >> 12) + (WORLD_SIZE_Z / 2) * CHUNK_SIZE_Z) / CHUNK_SIZE_Z};
+    LOG("chunk (%d,%d,%d)", chunkIndex.x, chunkIndex.y, chunkIndex.z);
     m_chunks[chunkIndex.z * WORLD_SIZE_X + chunkIndex.x]->plantOakTree(position);
 }
 
@@ -131,7 +132,7 @@ void World::loadCubeInformation()
     m_cubeInstances[CUBE_TYPE_OFFSET_OAK_WOOD] = new Cube(textureCoords, faceOpacities);
     /* oak leaves cube */
     textureCoords = {Vec2{112, 0}, Vec2{112, 0}, Vec2{112, 0}};
-    faceOpacities = {false, false, false, false, false, false, false};
+    //faceOpacities = {false, false, false, false, false, false, false};
     m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES] = new Cube(textureCoords, faceOpacities);
 
     /* add cubes and their properties here */
@@ -173,7 +174,14 @@ void World::initChunks()
                 m_chunks[z * WORLD_SIZE_X + x]->setNeighbour(CHUNK_SIDE_RIGHT, m_chunks[z * WORLD_SIZE_X + x + 1]);
         }
     }
+    /* plant some trees */
+    plantInitialTrees();
 
+    updateChunks();
+}
+
+void World::updateChunks()
+{
     for(int z = 0; z < WORLD_SIZE_Z; ++z)
     {
         for(int x = 0; x < WORLD_SIZE_X; ++x)
@@ -181,5 +189,15 @@ void World::initChunks()
             m_chunks[z * WORLD_SIZE_X + x]->updateDrawList();
         }
     }
-    
+}
+
+void World::plantInitialTrees()
+{
+    for(int z = 0; z < WORLD_SIZE_Z; ++z)
+    {
+        for(int x = 0; x < WORLD_SIZE_X; ++x)
+        {
+            m_chunks[z * WORLD_SIZE_X + x]->plantInitialTrees();
+        }
+    }
 }

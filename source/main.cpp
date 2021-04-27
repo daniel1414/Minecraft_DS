@@ -12,6 +12,7 @@
 
 #include "Log.h"
 #include "NoiseGenerator.h"
+#include "Random.h"
 #include "Renderer.h"
 #include "Sprite.h"
 #include "World.h"
@@ -62,7 +63,11 @@ int main(void) {
 
 	world = new World();
 
-	world->plantOakTree({0, inttof32(CHUNK_SIZE_Y - 8), 0});
+	/* world->plantOakTree({inttof32(-CHUNK_SIZE_X), inttof32(CHUNK_SIZE_Y - 12), inttof32(-CHUNK_SIZE_Z + 2)});
+	world->plantOakTree({inttof32(CHUNK_SIZE_X), inttof32(CHUNK_SIZE_Y - 12), 0});
+	world->plantOakTree({inttof32(CHUNK_SIZE_X), inttof32(CHUNK_SIZE_Y - 12), inttof32(CHUNK_SIZE_Z)});
+	world->plantOakTree({inttof32(0), inttof32(CHUNK_SIZE_Y - 12), inttof32(CHUNK_SIZE_Z)});
+	world->updateChunks(); */
 
 	while(1) {
 

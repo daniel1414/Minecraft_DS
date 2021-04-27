@@ -1,10 +1,11 @@
 #include "Chunk.h"
+
 #include "NoiseGenerator.h"
+#include "Random.h"
 
 Chunk::Chunk(const Vec2& position, Cube** cubeInstances) : m_position(position), m_cubeInstances(cubeInstances)
 {
     init();
-    updateDrawList();
 }
 
 Chunk::~Chunk()
@@ -15,7 +16,7 @@ Chunk::~Chunk()
 
 void Chunk::plantOakTree(const Vec3& position)
 {
-    Vec3 blockIndex = {((m_position.x - position.x) >> 12), position.y >> 12, ((m_position.y - position.z) >> 12)};    
+    Vec3 blockIndex = {((position.x - m_position.x) >> 12), position.y >> 12, ((position.z - m_position.y) >> 12)};    
     int stage = 0;
     for(int y = blockIndex.y + TREE_HEIGHT; y > blockIndex.y + TREE_HEIGHT - 3; --y)
     {
@@ -28,17 +29,14 @@ void Chunk::plantOakTree(const Vec3& position)
                     if(x < 0)
                     {
                         m_sideChunks[CHUNK_SIDE_BACK_LEFT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (CHUNK_SIZE_Z + z) * CHUNK_SIZE_X + (CHUNK_SIZE_X + x)] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
-                        m_sideChunks[CHUNK_SIDE_BACK_LEFT]->updateDrawList();
                     } 
                     else if(x > CHUNK_SIZE_X - 1)
                     {
                         m_sideChunks[CHUNK_SIDE_BACK_RIGHT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (CHUNK_SIZE_Z + z) * CHUNK_SIZE_X + (x % CHUNK_SIZE_X)] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
-                        m_sideChunks[CHUNK_SIDE_BACK_RIGHT]->updateDrawList();
                     }
                     else
                     {
                         m_sideChunks[CHUNK_SIDE_BACK]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (CHUNK_SIZE_Z + z) * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
-                        m_sideChunks[CHUNK_SIDE_BACK]->updateDrawList();
                     }
                 }
                 else if(z > CHUNK_SIZE_Z - 1)
@@ -46,17 +44,14 @@ void Chunk::plantOakTree(const Vec3& position)
                     if(x < 0)
                     {
                         m_sideChunks[CHUNK_SIDE_FRONT_LEFT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (z % CHUNK_SIZE_Z) * CHUNK_SIZE_X + (CHUNK_SIZE_X + x)] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
-                        m_sideChunks[CHUNK_SIDE_FRONT_LEFT]->updateDrawList();
                     } 
                     else if(x > CHUNK_SIZE_X - 1)
                     {
                         m_sideChunks[CHUNK_SIDE_FRONT_RIGHT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (z % CHUNK_SIZE_Z) * CHUNK_SIZE_X + (x % CHUNK_SIZE_X)] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
-                        m_sideChunks[CHUNK_SIDE_FRONT_RIGHT]->updateDrawList();
                     }
                     else
                     {
                         m_sideChunks[CHUNK_SIDE_FRONT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (z % CHUNK_SIZE_Z) * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
-                        m_sideChunks[CHUNK_SIDE_FRONT]->updateDrawList();
                     }
                 } 
                 else 
@@ -64,17 +59,14 @@ void Chunk::plantOakTree(const Vec3& position)
                     if(x < 0)
                     {
                         m_sideChunks[CHUNK_SIDE_LEFT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + (CHUNK_SIZE_X + x)] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
-                        m_sideChunks[CHUNK_SIDE_LEFT]->updateDrawList();
                     } 
                     else if(x > CHUNK_SIZE_X - 1)
                     {
                         m_sideChunks[CHUNK_SIDE_RIGHT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + (x % CHUNK_SIZE_X)] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
-                        m_sideChunks[CHUNK_SIDE_RIGHT]->updateDrawList();
                     }
                     else 
                     {
                         m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
-                        updateDrawList();
                     }
                 }
             }
@@ -85,7 +77,25 @@ void Chunk::plantOakTree(const Vec3& position)
     {
         m_cubes[y * CHUNK_SIZE_X * CHUNK_SIZE_Z + blockIndex.z * CHUNK_SIZE_X + blockIndex.x] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_WOOD];
     }
-    updateDrawList();
+}
+
+void Chunk::plantInitialTrees()
+{
+    for(int y = CHUNK_SIZE_Y - 2; y > 0 ; --y)
+    {
+        for(int z = CHUNK_SIZE_Z - 1; z > -1; --z)
+        {
+            for(int x = CHUNK_SIZE_X - 1; x > -1; --x)
+            {
+                if(m_cubes[(y - 1) * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] == m_cubeInstances[CUBE_TYPE_OFFSET_GRASS])
+                {
+                    int randomValue = Random::getInt(0, 100);
+                    if(randomValue > 99)
+                        plantOakTree({m_position.x + inttof32(x), inttof32(y), m_position.y + inttof32(z)});
+                }
+            }
+        }
+    }
 }
 
 bool Chunk::destroyCube(const Vec3& cameraPosition, const Vec3& cameraFront, int32 distance)
@@ -281,10 +291,6 @@ void Chunk::updateDrawList()
     }
 }
 
-
-
-
-
 void Chunk::init()
 {
     m_cubes = (Cube**)new Cube*[CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z];
@@ -309,18 +315,19 @@ void Chunk::init()
         for(int x = 0; x < CHUNK_SIZE_X; ++x)
         {
             int32 y = NoiseGenerator::noise2D(offset);
-            m_cubes[((mulf32(y, inttof32(10)) >> 12) + CHUNK_SIZE_Y - 10) * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_GRASS];
+            m_cubes[((mulf32(y, inttof32(10)) >> 12) + CHUNK_SIZE_Y - 15) * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_GRASS];
             offset.x += step;
         }
+        
         offset.x = mulf32(divf32(m_position.x + inttof32(WORLD_SIZE_X / 2 * CHUNK_SIZE_X), inttof32(CHUNK_SIZE_X)), mulf32(inttof32(CHUNK_SIZE_X), step));
         offset.y += step;
     }
     
-    for(int y = CHUNK_SIZE_Y - 2; y > -1 ; --y)
+    for(int y = CHUNK_SIZE_Y - 2; y > 0 ; --y)
     {
         for(int z = CHUNK_SIZE_Z - 1; z > -1; --z)
         {
-            for(int x = CHUNK_SIZE_X; x > -1; --x)
+            for(int x = CHUNK_SIZE_X - 1; x > -1; --x)
             {
                 if(m_cubes[(y + 1) * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] == m_cubeInstances[CUBE_TYPE_OFFSET_GRASS]
                         || m_cubes[(y + 2) * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] == m_cubeInstances[CUBE_TYPE_OFFSET_GRASS])

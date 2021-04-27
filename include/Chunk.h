@@ -35,6 +35,7 @@ public:
     ~Chunk();
 
     void plantOakTree(const Vec3& position);
+    void plantInitialTrees();
     // returns true if operation is over
     bool destroyCube(const Vec3& cameraPosition, const Vec3& cameraFront, int32 distance);
     
