@@ -3,7 +3,7 @@
 #include "Log.h"
 
 int32 NoiseGenerator::seed[SEED_SIZE] = {floattof32(0.9f), floattof32(-0.4f), floattof32(0.6f), floattof32(-0.5f), floattof32(0.3f), 
-    /* floattof32(-0.4f), floattof32(0.8f), floattof32(-0.2f), floattof32(0.2f), floattof32(0.7f) */};
+    floattof32(-0.4f), floattof32(0.8f), floattof32(-0.2f), floattof32(0.2f), floattof32(0.7f)};
 
 int32 NoiseGenerator::fade(int32 t)
 {
@@ -23,7 +23,7 @@ int32 NoiseGenerator::fadeXY(int32 x, int32 y)
 
 Vec2 NoiseGenerator::grad(int x, int y)
 {
-    return {NoiseGenerator::seed[(x * 12) % SEED_SIZE], NoiseGenerator::seed[(y * 14) % SEED_SIZE]};
+    return {NoiseGenerator::seed[(x * 7) % SEED_SIZE], NoiseGenerator::seed[(y * 5) % SEED_SIZE]};
 }
 
 /**

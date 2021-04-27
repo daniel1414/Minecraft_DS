@@ -3,9 +3,7 @@
 #include <nds/arm9/input.h>
 #include <nds/arm9/videoGL.h>
 #include <nds/arm9/console.h>
-#include <nds/arm9/boxtest.h>
-
-#include <vector>
+#include <nds/timers.h>
 
 #include "texture_classic.h"
 #include "center_cross.h"
@@ -16,6 +14,13 @@
 #include "Renderer.h"
 #include "Sprite.h"
 #include "World.h"
+
+#define DT_TIMER 0 
+
+void dTTimerCallback()
+{
+	timerStart(DT_TIMER, ClockDivider_1024, 0, dTTimerCallback);
+}
 
 Camera* mainCamera = nullptr;
 
@@ -63,14 +68,12 @@ int main(void) {
 
 	world = new World();
 
-	/* world->plantOakTree({inttof32(-CHUNK_SIZE_X), inttof32(CHUNK_SIZE_Y - 12), inttof32(-CHUNK_SIZE_Z + 2)});
-	world->plantOakTree({inttof32(CHUNK_SIZE_X), inttof32(CHUNK_SIZE_Y - 12), 0});
-	world->plantOakTree({inttof32(CHUNK_SIZE_X), inttof32(CHUNK_SIZE_Y - 12), inttof32(CHUNK_SIZE_Z)});
-	world->plantOakTree({inttof32(0), inttof32(CHUNK_SIZE_Y - 12), inttof32(CHUNK_SIZE_Z)});
-	world->updateChunks(); */
+	timerStart(DT_TIMER, ClockDivider_1024, 0, dTTimerCallback);
 
 	while(1) {
-
+		
+		int32 deltaTime = timerElapsed(DT_TIMER);
+		LOG("dT %d", deltaTime);
 		// clear the depth buffer
 		glClearDepth(GL_MAX_DEPTH);
 		// key input
@@ -80,7 +83,7 @@ int main(void) {
 
 		if(keysH)
 		{
-			mainCamera->processKeyInput(keysH, floattof32(0.1f));
+			mainCamera->processKeyInput(keysH, deltaTime);
 		}
 		if(keysD & KEY_A)
 		{

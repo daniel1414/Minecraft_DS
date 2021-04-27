@@ -49,7 +49,6 @@ World::~World()
 void World::plantOakTree(const Vec3& position)
 {
     Vec3 chunkIndex = {((position.x >> 12) + (WORLD_SIZE_X / 2) * CHUNK_SIZE_X) / CHUNK_SIZE_X, 0, ((position.z >> 12) + (WORLD_SIZE_Z / 2) * CHUNK_SIZE_Z) / CHUNK_SIZE_Z};
-    LOG("chunk (%d,%d,%d)", chunkIndex.x, chunkIndex.y, chunkIndex.z);
     m_chunks[chunkIndex.z * WORLD_SIZE_X + chunkIndex.x]->plantOakTree(position);
 }
 

@@ -1,7 +1,7 @@
 #ifndef _NOISE_GENERATOR_H_
 #define _NOISE_GENERATOR_H_
 
-#define SEED_SIZE 5
+#define SEED_SIZE 10
 
 #include <nds.h>
 
