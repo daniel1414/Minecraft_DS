@@ -35,7 +35,8 @@ public:
     ~Chunk();
 
     void plantOakTree(const Vec3& position);
-    void plantInitialTrees();
+    void setBlock(const Vec3& position, Cube* cubeInstance);
+    void plantInitialPlants();
     // returns true if operation is over
     bool destroyCube(const Vec3& cameraPosition, const Vec3& cameraFront, int32 distance);
     
@@ -54,5 +55,6 @@ private:
     // m_cubes contain pointers to the actual cubes
     Cube** m_cubes = nullptr;
     CubeNode* m_visibleCubes = nullptr;
+    
     Chunk* m_sideChunks[8]; // front(z+), right(x+), back(z-), left(x-)
 };

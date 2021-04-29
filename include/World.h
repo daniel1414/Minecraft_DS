@@ -23,5 +23,5 @@ private:
 private:
     void loadCubeInformation();
     void initChunks();
-    void plantInitialTrees();
+    void plantInitialPlants();
 };

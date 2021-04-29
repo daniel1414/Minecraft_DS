@@ -7,7 +7,7 @@
 #define CUBE_RADIUS (int32)floattof32(0.8f)
 #define TEXTURE_SIZE 16
 
-#define CUBE_TYPE_COUNT 7
+#define CUBE_TYPE_COUNT 8
 
 #define CUBE_TYPE_OFFSET_AIR 0
 #define CUBE_TYPE_OFFSET_GRASS 1
@@ -16,7 +16,7 @@
 #define CUBE_TYPE_OFFSET_COBBLESTONE 4
 #define CUBE_TYPE_OFFSET_OAK_WOOD 5 
 #define CUBE_TYPE_OFFSET_OAK_LEAVES 6
-
+#define CUBE_TYPE_OFFSET_GRASS_PLANT 7
 
 enum CUBE_FACES
 {
@@ -26,7 +26,7 @@ enum CUBE_FACES
     CUBE_FACE_BACK,
     CUBE_FACE_LEFT,
     CUBE_FACE_TOP,
-    CUBE_FACE_NONE
+    CUBE_FACE_ALL
 };
 
 enum CUBE_TEXTURE_COORDS
@@ -40,23 +40,24 @@ class Cube
 {
 public:
     Cube(Vec2 texCoords[], bool faceOpacities[]);
-    
-    void drawFace(const Vec3& position, CUBE_FACES face) const;
+    virtual ~Cube() = default;
+
+    virtual void drawFace(const Vec3& position, CUBE_FACES face) const;
     void draw(const Vec3& position) const;
 
     bool isOpaque(CUBE_FACES face) const { return m_faceOpaque[face]; }
-private:
+protected:
     Vec2 m_texCoords[3]; // according to CUBE_TEXTURE_COORDS
     bool m_faceOpaque[7]; // according to CUBE_FACES enum
     // add some other stuff according to every cube in the universe
 };
 
-class PlantCube
+class PlantCube : public Cube
 {
 public:
     PlantCube(Vec2 texCoords[], bool faceOpacities[]);
 
-    
+    void drawFace(const Vec3& position, CUBE_FACES face) const override;
 };
 
 struct CubeNode

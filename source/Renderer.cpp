@@ -13,7 +13,7 @@
 
 struct RendererStorage
 {
-    v16 vertexPositions[3 * 12] = {
+    v16 vertexPositions[5 * 12] = {
         // XY from front
         inttov16(0), inttov16(0), inttov16(0),
         inttov16(1), inttov16(0), inttov16(0),
@@ -28,15 +28,28 @@ struct RendererStorage
         inttov16(0), inttov16(0), inttov16(1),
         inttov16(0), inttov16(0), inttov16(0),
         inttov16(0), inttov16(1), inttov16(0),
-        inttov16(0), inttov16(1), inttov16(1)
+        inttov16(0), inttov16(1), inttov16(1),
+        // Diagonal from right
+        inttov16(0), inttov16(0), inttov16(1),
+        inttov16(1), inttov16(0), inttov16(0),
+        inttov16(1), inttov16(1), inttov16(0),
+        inttov16(0), inttov16(1), inttov16(1),
+        // Diagonal from left
+        inttov16(0), inttov16(0), inttov16(0),
+        inttov16(1), inttov16(0), inttov16(1),
+        inttov16(1), inttov16(1), inttov16(1),
+        inttov16(0), inttov16(1), inttov16(0),
+
     };
-    uint8_t vertexIndices[4 * 6] = {
+    uint8_t vertexIndices[8 * 4] = {
         0, 3, 6, 9, // XY front
         0, 9, 6, 3, // XY back
         12, 15, 18, 21, // XZ top
         12, 21, 18, 15, // XZ bottom
         24, 27, 30, 33, // YZ right
-        24, 33, 30, 27  // YZ left
+        24, 33, 30, 27, // YZ left
+        36, 39, 42, 45, // diagonal right
+        48, 51, 54, 57, // diagonal left
     };
     int texturePositions[2 * 4] = { 
         0, 0,
@@ -73,7 +86,7 @@ void Renderer::endScene()
 }
 
 void Renderer::drawQuad(const Vec3& position, const Vec3& size, const Vec2& texCoords, const Vec2& texSize, const Vec3& normal,
-    uint16_t color, float angle, const Vec3& rotationAxis)
+    uint16_t color, int angleDeg, const Vec3& rotationAxis)
 {
     storage.packedCommands[0] = 26;
 
@@ -123,6 +136,14 @@ void Renderer::drawQuad(const Vec3& position, const Vec3& size, const Vec2& texC
     {
         vertexIndicesOffset = 20;
         textureIndexOffset = 4;
+    }
+    else if(angleDeg == 45 && rotationAxis.y == inttof32(1))
+    {
+        vertexIndicesOffset = 24;
+    }
+    else if(angleDeg == -45 && rotationAxis.y == inttof32(1))
+    {
+        vertexIndicesOffset = 28;
     }
 
 	storage.packedCommands[12] = TEXTURE_PACK(inttot16(storage.texturePositions[storage.textureIndices[textureIndexOffset]]), inttot16(storage.texturePositions[storage.textureIndices[textureIndexOffset] + 1]));

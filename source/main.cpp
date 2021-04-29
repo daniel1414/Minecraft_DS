@@ -105,7 +105,7 @@ int main(void) {
 		glBindTexture(0, grass_texture);
 
 		world->drawTerrain(mainCamera);
-		//cube->draw();
+		
 		Renderer::endScene();
 
 		Sprite::updateAll();

@@ -111,11 +111,11 @@ void World::loadCubeInformation()
 {
     /* air cube */
     textureCoords = {Vec2{-1, -1}, Vec2{-1, -1}, Vec2{-1, -1}};
-    faceOpacities = {false, false, false, false, false, false, true};
+    faceOpacities = {false, false, false, false, false, false, false};
     m_cubeInstances[CUBE_TYPE_OFFSET_AIR] = new Cube(textureCoords, faceOpacities);
     /* grass cube */
     textureCoords = {Vec2{0, 0}, Vec2{16, 0}, Vec2{32, 0}};
-    faceOpacities = {true, true, true, true, true, true, false};
+    faceOpacities = {true, true, true, true, true, true, true};
     m_cubeInstances[CUBE_TYPE_OFFSET_GRASS] = new Cube(textureCoords, faceOpacities);
     /* dirt cube */
     textureCoords = {Vec2{0, 0}, Vec2{0, 0}, Vec2{0, 0}};
@@ -131,8 +131,11 @@ void World::loadCubeInformation()
     m_cubeInstances[CUBE_TYPE_OFFSET_OAK_WOOD] = new Cube(textureCoords, faceOpacities);
     /* oak leaves cube */
     textureCoords = {Vec2{16, 16}, Vec2{16, 16}, Vec2{16, 16}};
-    faceOpacities = {false, false, false, false, false, false, true};
+    faceOpacities = {false, false, false, false, false, false, false};
     m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES] = new Cube(textureCoords, faceOpacities);
+    /* grass plant */
+    textureCoords = {Vec2{32, 16}, Vec2{32, 16}, Vec2{32, 16}};
+    m_cubeInstances[CUBE_TYPE_OFFSET_GRASS_PLANT] = new PlantCube(textureCoords, faceOpacities);
 
     /* add cubes and their properties here */
 }
@@ -173,8 +176,8 @@ void World::initChunks()
                 m_chunks[z * WORLD_SIZE_X + x]->setNeighbour(CHUNK_SIDE_RIGHT, m_chunks[z * WORLD_SIZE_X + x + 1]);
         }
     }
-    /* plant some trees */
-    plantInitialTrees();
+    /* plant some plant */
+    plantInitialPlants();
 
     updateChunks();
 }
@@ -190,13 +193,13 @@ void World::updateChunks()
     }
 }
 
-void World::plantInitialTrees()
+void World::plantInitialPlants()
 {
     for(int z = 0; z < WORLD_SIZE_Z; ++z)
     {
         for(int x = 0; x < WORLD_SIZE_X; ++x)
         {
-            m_chunks[z * WORLD_SIZE_X + x]->plantInitialTrees();
+            m_chunks[z * WORLD_SIZE_X + x]->plantInitialPlants();
         }
     }
 }

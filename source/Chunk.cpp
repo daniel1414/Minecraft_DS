@@ -1,5 +1,7 @@
 #include "Chunk.h"
 
+#include <nds/arm9/videoGL.h>
+
 #include "NoiseGenerator.h"
 #include "Random.h"
 
@@ -82,7 +84,13 @@ void Chunk::plantOakTree(const Vec3& position)
     }
 }
 
-void Chunk::plantInitialTrees()
+void Chunk::setBlock(const Vec3& position, Cube* cubeInstance)
+{
+    Vec3 blockIndex = {((position.x - m_position.x) >> 12), position.y >> 12, ((position.z - m_position.y) >> 12)};
+    m_cubes[blockIndex.y * CHUNK_SIZE_X * CHUNK_SIZE_Z + blockIndex.z * CHUNK_SIZE_X + blockIndex.x] = cubeInstance;
+}
+
+void Chunk::plantInitialPlants()
 {
     for(int y = CHUNK_SIZE_Y - 2; y > 0 ; --y)
     {
@@ -95,6 +103,8 @@ void Chunk::plantInitialTrees()
                     int randomValue = Random::getInt(0, 100);
                     if(randomValue > 99)
                         plantOakTree({m_position.x + inttof32(x), inttof32(y), m_position.y + inttof32(z)});
+                    else if(randomValue > 90)
+                        setBlock({m_position.x + inttof32(x), inttof32(y), m_position.y + inttof32(z)}, m_cubeInstances[CUBE_TYPE_OFFSET_GRASS_PLANT]);
                 }
             }
         }
@@ -187,6 +197,12 @@ void Chunk::draw(Camera* camera) const
         {
             if(camPosition.x < head->position.x)
                 head->cube->drawFace(head->position, CUBE_FACE_LEFT);
+        }
+        if(head->visibleFaces & (1 << 6)) //all
+        {
+            glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | (1 << 11) | POLY_ID(0) | POLY_FOG);
+            head->cube->drawFace(head->position, CUBE_FACE_ALL);
+            glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | (1 << 11) | POLY_ID(0) | POLY_FOG);
         }
         head = head->next;
     }
@@ -283,7 +299,17 @@ void Chunk::updateDrawList()
                         }
                         head->visibleFaces = (head->visibleFaces | (1 << 5));
                     }
-
+                    // plants
+                    if(m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] == m_cubeInstances[CUBE_TYPE_OFFSET_GRASS_PLANT])
+                    {
+                        if(head->position.y == inttof32(-1))
+                        {
+                            head->position = cubePosition;
+                            head->cube = m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x];
+                            head->next = new CubeNode();
+                        }
+                        head->visibleFaces = (head->visibleFaces | (1 << 6));
+                    }
                     if(head->next != nullptr)
                     {
                         head = head->next;
