@@ -15,6 +15,8 @@ public:
     void destroyCube(const Vec3& cameraPosition, const Vec3& cameraDirection);
 
     void drawTerrain(Camera* camera) const;
+    void drawPlants(Camera* camera) const;
+    
     void updateChunks();
 private:
     Cube* m_cubeInstances[CUBE_TYPE_COUNT];

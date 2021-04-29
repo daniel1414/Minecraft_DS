@@ -98,13 +98,18 @@ void Chunk::plantInitialPlants()
         {
             for(int x = CHUNK_SIZE_X - 1; x > -1; --x)
             {
-                if(m_cubes[(y - 1) * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] == m_cubeInstances[CUBE_TYPE_OFFSET_GRASS])
+                if(m_cubes[(y - 1) * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] == m_cubeInstances[CUBE_TYPE_OFFSET_GRASS]
+                    && m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] == m_cubeInstances[CUBE_TYPE_OFFSET_AIR])
                 {
                     int randomValue = Random::getInt(0, 100);
                     if(randomValue > 99)
                         plantOakTree({m_position.x + inttof32(x), inttof32(y), m_position.y + inttof32(z)});
                     else if(randomValue > 90)
                         setBlock({m_position.x + inttof32(x), inttof32(y), m_position.y + inttof32(z)}, m_cubeInstances[CUBE_TYPE_OFFSET_GRASS_PLANT]);
+                    else if(randomValue > 85)
+                        setBlock({m_position.x + inttof32(x), inttof32(y), m_position.y + inttof32(z)}, m_cubeInstances[CUBE_TYPE_OFFSET_ROSE]);
+                    else if(randomValue > 80)
+                        setBlock({m_position.x + inttof32(x), inttof32(y), m_position.y + inttof32(z)}, m_cubeInstances[CUBE_TYPE_OFFSET_DAFFODIL]);
                 }
             }
         }
@@ -162,7 +167,7 @@ bool Chunk::destroyCube(const Vec3& cameraPosition, const Vec3& cameraFront, int
     return result;
 }
 
-void Chunk::draw(Camera* camera) const
+void Chunk::drawTerrain(Camera* camera) const
 {
     const Vec3& camPosition = camera->getPosition();
     CubeNode* head = m_visibleCubes;
@@ -198,12 +203,17 @@ void Chunk::draw(Camera* camera) const
             if(camPosition.x < head->position.x)
                 head->cube->drawFace(head->position, CUBE_FACE_LEFT);
         }
-        if(head->visibleFaces & (1 << 6)) //all
-        {
-            glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | (1 << 11) | POLY_ID(0) | POLY_FOG);
-            head->cube->drawFace(head->position, CUBE_FACE_ALL);
-            glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | (1 << 11) | POLY_ID(0) | POLY_FOG);
-        }
+        head = head->next;
+    }
+}
+
+void Chunk::drawPlants(Camera* camera) const
+{
+    const Vec3& camPosition = camera->getPosition();
+    CubeNode* head = m_plants;
+    while(head->next != nullptr)
+    {
+        head->cube->drawFace(head->position, CUBE_FACE_ALL);
         head = head->next;
     }
 }
@@ -212,8 +222,10 @@ void Chunk::updateDrawList()
 {
     deleteDrawList();
     m_visibleCubes = new CubeNode();
-    
-    CubeNode* head = m_visibleCubes;
+    m_plants = new CubeNode();
+
+    CubeNode* terrainHead = m_visibleCubes;
+    CubeNode* plantHead = m_plants;
 
     for(int y = 0; y < CHUNK_SIZE_Y; ++y)
     {
@@ -227,92 +239,98 @@ void Chunk::updateDrawList()
                     // check bottom (y - 1)
                     if(y != 0 && !m_cubes[(y - 1) * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x]->isOpaque(CUBE_FACE_TOP))
                     {
-                        if(head->position.y == inttof32(-1)) 
+                        if(terrainHead->position.y == inttof32(-1)) 
                         {
-                            head->position = cubePosition;
-                            head->cube = m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x];
-                            head->next = new CubeNode();
+                            terrainHead->position = cubePosition;
+                            terrainHead->cube = m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x];
+                            terrainHead->next = new CubeNode();
                         }
-                        head->visibleFaces =  (head->visibleFaces | 1);
+                        terrainHead->visibleFaces |= 1;
                     }
                     // check front (z + 1)
                     if((z == CHUNK_SIZE_Z - 1 && ((m_position.y >> 12) + CHUNK_SIZE_Z < WORLD_SIZE_Z * CHUNK_SIZE_Z / 2)
                         && (m_sideChunks[CHUNK_SIDE_FRONT] == nullptr || !m_sideChunks[CHUNK_SIDE_FRONT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + 0 * CHUNK_SIZE_X + x]->isOpaque(CUBE_FACE_BACK))) 
                         || !m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (z + 1) * CHUNK_SIZE_X + x]->isOpaque(CUBE_FACE_BACK))
                     {
-                        if(head->position.y == inttof32(-1)) 
+                        if(terrainHead->position.y == inttof32(-1)) 
                         {
-                            head->position = cubePosition;
-                            head->cube = m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x];
-                            head->next = new CubeNode();
+                            terrainHead->position = cubePosition;
+                            terrainHead->cube = m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x];
+                            terrainHead->next = new CubeNode();
                         }
-                        head->visibleFaces =  (head->visibleFaces | (1 << 1));
+                        terrainHead->visibleFaces |= (1 << 1);
                     }
                     // check right (x + 1)
                     if((x == CHUNK_SIZE_X - 1 && ((m_position.x >> 12) + CHUNK_SIZE_X < WORLD_SIZE_X * CHUNK_SIZE_X / 2)
                         && (m_sideChunks[CHUNK_SIDE_RIGHT] == nullptr || !m_sideChunks[CHUNK_SIDE_RIGHT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + 0]->isOpaque(CUBE_FACE_LEFT))) 
                         || !m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x + 1]->isOpaque(CUBE_FACE_LEFT))
                     {
-                        if(head->position.y == inttof32(-1)) 
+                        if(terrainHead->position.y == inttof32(-1)) 
                         {
-                            head->position = cubePosition;
-                            head->cube = m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x];
-                            head->next = new CubeNode();
+                            terrainHead->position = cubePosition;
+                            terrainHead->cube = m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x];
+                            terrainHead->next = new CubeNode();
                         }
-                        head->visibleFaces = (head->visibleFaces | (1 << 2));
+                        terrainHead->visibleFaces |= (1 << 2);
                     }
                     // check back
                     if((z == 0 && ((m_position.y >> 12) + (WORLD_SIZE_X / 2) * CHUNK_SIZE_Z > 0)
                         && (m_sideChunks[CHUNK_SIDE_BACK] == nullptr || !m_sideChunks[CHUNK_SIDE_BACK]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (CHUNK_SIZE_Z - 1) * CHUNK_SIZE_X + x]->isOpaque(CUBE_FACE_FRONT))) 
                         || !m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (z - 1) * CHUNK_SIZE_X + x]->isOpaque(CUBE_FACE_FRONT))
                     {
-                        if(head->position.y == inttof32(-1)) 
+                        if(terrainHead->position.y == inttof32(-1)) 
                         {
-                            head->position = cubePosition;
-                            head->cube = m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x];
-                            head->next = new CubeNode();
+                            terrainHead->position = cubePosition;
+                            terrainHead->cube = m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x];
+                            terrainHead->next = new CubeNode();
                         }
-                        head->visibleFaces = (head->visibleFaces | (1 << 3));
+                        terrainHead->visibleFaces |= (1 << 3);
                     }
                     // check left
                     if((x == 0 && ((m_position.x >> 12) + (WORLD_SIZE_X / 2) * CHUNK_SIZE_X > 0)
                         && (m_sideChunks[CHUNK_SIDE_LEFT] == nullptr || !m_sideChunks[CHUNK_SIDE_LEFT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + CHUNK_SIZE_X - 1]->isOpaque(CUBE_FACE_RIGHT))) 
                         || !m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x - 1]->isOpaque(CUBE_FACE_RIGHT))
                     {
-                        if(head->position.y == inttof32(-1)) 
+                        if(terrainHead->position.y == inttof32(-1)) 
                         {
-                            head->position = cubePosition;
-                            head->cube = m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x];
-                            head->next = new CubeNode();
+                            terrainHead->position = cubePosition;
+                            terrainHead->cube = m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x];
+                            terrainHead->next = new CubeNode();
                         }
-                        head->visibleFaces = (head->visibleFaces |(1 << 4));
+                        terrainHead->visibleFaces |= (1 << 4);
                     }
                     // check top
                     if(y == CHUNK_SIZE_Y - 1
                         || !m_cubes[(y + 1) * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x]->isOpaque(CUBE_FACE_BOTTOM))
                     {
-                        if(head->position.y == inttof32(-1))
+                        if(terrainHead->position.y == inttof32(-1))
                         {
-                            head->position = cubePosition;
-                            head->cube = m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x];
-                            head->next = new CubeNode();
+                            terrainHead->position = cubePosition;
+                            terrainHead->cube = m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x];
+                            terrainHead->next = new CubeNode();
                         }
-                        head->visibleFaces = (head->visibleFaces | (1 << 5));
+                        terrainHead->visibleFaces |= (1 << 5);
                     }
                     // plants
-                    if(m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] == m_cubeInstances[CUBE_TYPE_OFFSET_GRASS_PLANT])
+                    if(m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] == m_cubeInstances[CUBE_TYPE_OFFSET_GRASS_PLANT]
+                        || m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] == m_cubeInstances[CUBE_TYPE_OFFSET_ROSE]
+                        || m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] == m_cubeInstances[CUBE_TYPE_OFFSET_DAFFODIL])
                     {
-                        if(head->position.y == inttof32(-1))
+                        if(plantHead->position.y == inttof32(-1))
                         {
-                            head->position = cubePosition;
-                            head->cube = m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x];
-                            head->next = new CubeNode();
+                            plantHead->position = cubePosition;
+                            plantHead->cube = m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x];
+                            plantHead->next = new CubeNode();
                         }
-                        head->visibleFaces = (head->visibleFaces | (1 << 6));
                     }
-                    if(head->next != nullptr)
+
+                    if(terrainHead->next != nullptr)
                     {
-                        head = head->next;
+                        terrainHead = terrainHead->next;
+                    }
+                    if(plantHead->next != nullptr)
+                    {
+                        plantHead = plantHead->next;
                     }
                 }
             }
@@ -370,16 +388,25 @@ void Chunk::init()
 
     m_visibleCubes = new CubeNode();
 
+    m_plants = new CubeNode();
+
     for(int i = 0; i < 4; ++i)
     {
         m_sideChunks[i] = nullptr;
     }
-
 }
 
 void Chunk::deleteDrawList()
 {
     CubeNode* head = m_visibleCubes;
+    while(head != nullptr)
+    {
+        CubeNode* tmp = head;
+        head = head->next;
+        delete tmp;
+    }
+
+    head = m_plants;
     while(head != nullptr)
     {
         CubeNode* tmp = head;

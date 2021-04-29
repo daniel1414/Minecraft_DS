@@ -100,11 +100,32 @@ void World::drawTerrain(Camera* camera) const
 
                 if(isInFrustum)
                 {
-                    m_chunks[z * WORLD_SIZE_X + x]->draw(camera);
+                    m_chunks[z * WORLD_SIZE_X + x]->drawTerrain(camera);
                 }
             }
         }
     }
+}
+
+void World::drawPlants(Camera* camera) const
+{
+    
+    glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | (1 << 11) | POLY_ID(0) | POLY_FOG);
+
+    for(int z = 0; z < WORLD_SIZE_Z; ++z)
+    {
+        for(int x = 0; x < WORLD_SIZE_X; ++x)
+        {
+            if(((camera->getPosition().x >> 12) - ((x - WORLD_SIZE_X / 2) * CHUNK_SIZE_X) < VISIBLE_CHUNK_DISTANCE * CHUNK_SIZE_X)
+                && ((((x + 1) - WORLD_SIZE_X / 2) * CHUNK_SIZE_X) - (camera->getPosition().x >> 12) < VISIBLE_CHUNK_DISTANCE * CHUNK_SIZE_X)
+                && ((camera->getPosition().z >> 12) - ((z - WORLD_SIZE_Z / 2) * CHUNK_SIZE_Z) < VISIBLE_CHUNK_DISTANCE * CHUNK_SIZE_X)
+                && ((((z + 1) - WORLD_SIZE_Z / 2) * CHUNK_SIZE_Z) - (camera->getPosition().z >> 12) < VISIBLE_CHUNK_DISTANCE * CHUNK_SIZE_X))
+            {
+                m_chunks[z * WORLD_SIZE_X + x]->drawPlants(camera);
+            }
+        }
+    }
+    glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | (1 << 11) | POLY_ID(0) | POLY_FOG);
 }
 
 void World::loadCubeInformation()
@@ -136,7 +157,13 @@ void World::loadCubeInformation()
     /* grass plant */
     textureCoords = {Vec2{32, 16}, Vec2{32, 16}, Vec2{32, 16}};
     m_cubeInstances[CUBE_TYPE_OFFSET_GRASS_PLANT] = new PlantCube(textureCoords, faceOpacities);
-
+    /* rose plant */
+    textureCoords = {Vec2{80, 0}, Vec2{80, 0}, Vec2{80, 0}};
+    m_cubeInstances[CUBE_TYPE_OFFSET_ROSE] = new PlantCube(textureCoords, faceOpacities);
+    /* daffodil plant */
+    textureCoords = {Vec2{48, 16}, Vec2{48, 16}, Vec2{48, 16}};
+    m_cubeInstances[CUBE_TYPE_OFFSET_DAFFODIL] = new PlantCube(textureCoords, faceOpacities);
+    
     /* add cubes and their properties here */
 }
 

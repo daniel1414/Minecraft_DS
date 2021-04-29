@@ -41,7 +41,8 @@ public:
     bool destroyCube(const Vec3& cameraPosition, const Vec3& cameraFront, int32 distance);
     
     //void draw(Camera* camera) const;
-    void draw(Camera* camera) const;
+    void drawTerrain(Camera* camera) const;
+    void drawPlants(Camera* camera) const;
 
     const Cube** getCubes() { return (const Cube**)m_cubes; }
     void setNeighbour(CHUNK_SIDE side, Chunk* chunk) { m_sideChunks[side] = chunk; }
@@ -55,6 +56,6 @@ private:
     // m_cubes contain pointers to the actual cubes
     Cube** m_cubes = nullptr;
     CubeNode* m_visibleCubes = nullptr;
-    
+    CubeNode* m_plants = nullptr;
     Chunk* m_sideChunks[8]; // front(z+), right(x+), back(z-), left(x-)
 };
