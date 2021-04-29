@@ -57,6 +57,7 @@ int main(void) {
 	glGenTextures(1, &grass_texture);
 	glBindTexture(0, grass_texture);
 	glTexImage2D(0, 0, GL_RGB256, TEXTURE_SIZE_256, TEXTURE_SIZE_256, 0, TEXGEN_OFF, (void*)texture_classicBitmap);
+	glTexParameter(0, GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T | GL_TEXTURE_COLOR0_TRANSPARENT);
 	glColorTableEXT(0, 0, texture_classicPalLen / 2, 0, 0, (u16*)texture_classicPal);
 
 	glMaterialf(GL_EMISSION, RGB15(31, 31, 31));
@@ -73,7 +74,6 @@ int main(void) {
 	while(1) {
 		
 		int32 deltaTime = timerElapsed(DT_TIMER);
-		LOG("dT %d", deltaTime);
 		// clear the depth buffer
 		glClearDepth(GL_MAX_DEPTH);
 		// key input

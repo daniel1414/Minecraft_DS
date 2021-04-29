@@ -30,7 +30,7 @@ protected:
     Vec3 m_up = {0, inttof32(1), 0};
     Vec3 m_right = {inttof32(1), 0, 0};
 
-    int32 m_speed = floattof32(1.0f);
+    int32 m_speed = floattof32(0.6f);
 
     // stored as libnds angle
     int16 m_yaw = degreesToAngle(-90), m_pitch = degreesToAngle(0);

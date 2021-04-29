@@ -26,47 +26,50 @@ void Chunk::plantOakTree(const Vec3& position)
             {
                 if(z < 0)
                 {
-                    if(x < 0)
+                    if(x < 0 && m_sideChunks[CHUNK_SIDE_BACK_LEFT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (CHUNK_SIZE_Z + z) * CHUNK_SIZE_X + (CHUNK_SIZE_X + x)] == m_cubeInstances[CUBE_TYPE_OFFSET_AIR])
                     {
-                        m_sideChunks[CHUNK_SIDE_BACK_LEFT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (CHUNK_SIZE_Z + z) * CHUNK_SIZE_X + (CHUNK_SIZE_X + x)] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
+                            m_sideChunks[CHUNK_SIDE_BACK_LEFT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (CHUNK_SIZE_Z + z) * CHUNK_SIZE_X + (CHUNK_SIZE_X + x)] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
                     } 
-                    else if(x > CHUNK_SIZE_X - 1)
+                    else if(x > CHUNK_SIZE_X - 1 && m_sideChunks[CHUNK_SIDE_BACK_RIGHT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (CHUNK_SIZE_Z + z) * CHUNK_SIZE_X + (x % CHUNK_SIZE_X)] == m_cubeInstances[CUBE_TYPE_OFFSET_AIR])
                     {
                         m_sideChunks[CHUNK_SIDE_BACK_RIGHT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (CHUNK_SIZE_Z + z) * CHUNK_SIZE_X + (x % CHUNK_SIZE_X)] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
                     }
                     else
                     {
-                        m_sideChunks[CHUNK_SIDE_BACK]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (CHUNK_SIZE_Z + z) * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
+                        if(m_sideChunks[CHUNK_SIDE_BACK]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (CHUNK_SIZE_Z + z) * CHUNK_SIZE_X + x] == m_cubeInstances[CUBE_TYPE_OFFSET_AIR])
+                            m_sideChunks[CHUNK_SIDE_BACK]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (CHUNK_SIZE_Z + z) * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
                     }
                 }
                 else if(z > CHUNK_SIZE_Z - 1)
                 {
-                    if(x < 0)
+                    if(x < 0 && m_sideChunks[CHUNK_SIDE_FRONT_LEFT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (z % CHUNK_SIZE_Z) * CHUNK_SIZE_X + (CHUNK_SIZE_X + x)] == m_cubeInstances[CUBE_TYPE_OFFSET_AIR])
                     {
                         m_sideChunks[CHUNK_SIDE_FRONT_LEFT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (z % CHUNK_SIZE_Z) * CHUNK_SIZE_X + (CHUNK_SIZE_X + x)] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
                     } 
-                    else if(x > CHUNK_SIZE_X - 1)
+                    else if(x > CHUNK_SIZE_X - 1 && m_sideChunks[CHUNK_SIDE_FRONT_RIGHT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (z % CHUNK_SIZE_Z) * CHUNK_SIZE_X + (x % CHUNK_SIZE_X)] == m_cubeInstances[CUBE_TYPE_OFFSET_AIR])
                     {
                         m_sideChunks[CHUNK_SIDE_FRONT_RIGHT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (z % CHUNK_SIZE_Z) * CHUNK_SIZE_X + (x % CHUNK_SIZE_X)] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
                     }
                     else
                     {
-                        m_sideChunks[CHUNK_SIDE_FRONT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (z % CHUNK_SIZE_Z) * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
+                        if(m_sideChunks[CHUNK_SIDE_FRONT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (z % CHUNK_SIZE_Z) * CHUNK_SIZE_X + x] == m_cubeInstances[CUBE_TYPE_OFFSET_AIR])
+                            m_sideChunks[CHUNK_SIDE_FRONT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + (z % CHUNK_SIZE_Z) * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
                     }
                 } 
                 else 
                 {
-                    if(x < 0)
+                    if(x < 0 && m_sideChunks[CHUNK_SIDE_LEFT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + (CHUNK_SIZE_X + x)] == m_cubeInstances[CUBE_TYPE_OFFSET_AIR])
                     {
                         m_sideChunks[CHUNK_SIDE_LEFT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + (CHUNK_SIZE_X + x)] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
                     } 
-                    else if(x > CHUNK_SIZE_X - 1)
+                    else if(x > CHUNK_SIZE_X - 1 && m_sideChunks[CHUNK_SIDE_RIGHT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + (x % CHUNK_SIZE_X)] == m_cubeInstances[CUBE_TYPE_OFFSET_AIR])
                     {
                         m_sideChunks[CHUNK_SIDE_RIGHT]->getCubes()[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + (x % CHUNK_SIZE_X)] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
                     }
                     else 
                     {
-                        m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
+                        if(m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] == m_cubeInstances[CUBE_TYPE_OFFSET_AIR])
+                            m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] = m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES];
                     }
                 }
             }
@@ -121,7 +124,7 @@ bool Chunk::destroyCube(const Vec3& cameraPosition, const Vec3& cameraFront, int
             ((rayPosition.z >> 12) < CHUNK_SIZE_Z && (rayPosition.z >> 12) > -1) && 
             ((rayPosition.x >> 12) < CHUNK_SIZE_X && (rayPosition.x >> 12) > -1)) // check if position does not exceed the chunk limits
         {
-            if(!m_cubes[(rayPosition.y >> 12) * CHUNK_SIZE_Z * CHUNK_SIZE_X + (rayPosition.z >> 12) * CHUNK_SIZE_X + (rayPosition.x >> 12)]->isOpaque(CUBE_FACE_NONE))
+            if(m_cubes[(rayPosition.y >> 12) * CHUNK_SIZE_Z * CHUNK_SIZE_X + (rayPosition.z >> 12) * CHUNK_SIZE_X + (rayPosition.x >> 12)] != m_cubeInstances[CUBE_TYPE_OFFSET_AIR])
             {
                 m_cubes[(rayPosition.y >> 12) * CHUNK_SIZE_Z * CHUNK_SIZE_X + (rayPosition.z >> 12) * CHUNK_SIZE_X + (rayPosition.x >> 12)] = m_cubeInstances[CUBE_TYPE_OFFSET_AIR];
                 result = true;
@@ -202,7 +205,7 @@ void Chunk::updateDrawList()
         {
             for(int x = 0; x < CHUNK_SIZE_X; ++x)
             {
-                if(!m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x]->isOpaque(CUBE_FACE_NONE))
+                if(m_cubes[y * CHUNK_SIZE_Z * CHUNK_SIZE_X + z * CHUNK_SIZE_X + x] != m_cubeInstances[CUBE_TYPE_OFFSET_AIR])
                 {
                     Vec3 cubePosition = {m_position.x + inttof32(x), inttof32(y), m_position.y + inttof32(z)};
                     // check bottom (y - 1)

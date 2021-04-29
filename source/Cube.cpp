@@ -13,6 +13,8 @@ Cube::Cube(Vec2 texCoords[], bool faceOpacities[])
     }
 }
 
+
+
 void Cube::drawFace(const Vec3& position, CUBE_FACES face) const
 {
     switch(face)

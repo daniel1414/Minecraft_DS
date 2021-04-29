@@ -51,6 +51,14 @@ private:
     // add some other stuff according to every cube in the universe
 };
 
+class PlantCube
+{
+public:
+    PlantCube(Vec2 texCoords[], bool faceOpacities[]);
+
+    
+};
+
 struct CubeNode
 {
     CubeNode();

@@ -127,11 +127,11 @@ void World::loadCubeInformation()
     textureCoords = {Vec2{64, 0}, Vec2{64, 0}, Vec2{64, 0}};
     m_cubeInstances[CUBE_TYPE_OFFSET_COBBLESTONE] = new Cube(textureCoords, faceOpacities);
     /* oak wood cube */
-    textureCoords = {Vec2{80, 0}, Vec2{96, 0}, Vec2{80, 0}};
+    textureCoords = {Vec2{0, 16}, Vec2{96, 0}, Vec2{0, 16}};
     m_cubeInstances[CUBE_TYPE_OFFSET_OAK_WOOD] = new Cube(textureCoords, faceOpacities);
     /* oak leaves cube */
-    textureCoords = {Vec2{112, 0}, Vec2{112, 0}, Vec2{112, 0}};
-    //faceOpacities = {false, false, false, false, false, false, false};
+    textureCoords = {Vec2{16, 16}, Vec2{16, 16}, Vec2{16, 16}};
+    faceOpacities = {false, false, false, false, false, false, true};
     m_cubeInstances[CUBE_TYPE_OFFSET_OAK_LEAVES] = new Cube(textureCoords, faceOpacities);
 
     /* add cubes and their properties here */

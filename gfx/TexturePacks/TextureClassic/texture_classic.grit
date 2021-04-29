@@ -1,7 +1,9 @@
+-gx
+
 -gb
 
 -gB8
 
 -pe256
 
--gT[FF00FF]
+-gT FF00FF
