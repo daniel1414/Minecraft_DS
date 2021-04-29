@@ -11,12 +11,13 @@ For now it's jutst a small floating terrain with a camera where you can move aro
   - World generation refinement (stones, ores, caves etc.)
   - Water
   - Day and Night cycle
+  - Lighting
   - Monsters
   - So much more
 
 # Shots from the game
 
-![](game_images/plants.png)
+![](game_images/plants.png) ![](game_images/hole.png)
 
 # Features already implemented
   - World generation (used with own implementation of two dimensional Perlin Noise based on Dave Mount & Roger Eastman's CMSC 425 Lecture 13)

@@ -2,8 +2,8 @@
 
 #include "Log.h"
 
-int32 NoiseGenerator::seed[SEED_SIZE] = {floattof32(0.9f), floattof32(-0.4f), floattof32(0.6f), floattof32(-0.5f), floattof32(0.3f), 
-    floattof32(-0.4f), floattof32(0.8f), floattof32(-0.2f), floattof32(0.2f), floattof32(0.7f)};
+int32 NoiseGenerator::seed[SEED_SIZE] = {floattof32(0.5f), floattof32(-0.2f), floattof32(0.6f), floattof32(-0.5f), floattof32(0.8f), 
+    floattof32(-0.2f), floattof32(0.7f), floattof32(-0.2f), floattof32(0.7f), floattof32(0.7f)};
 
 int32 NoiseGenerator::fade(int32 t)
 {
