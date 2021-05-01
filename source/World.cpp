@@ -110,7 +110,7 @@ void World::drawTerrain(Camera* camera) const
 void World::drawPlants(Camera* camera) const
 {
     
-    glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | (1 << 11) | POLY_ID(0) | POLY_FOG);
+    glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | (1 << 11) | POLY_ID(0) | POLY_FORMAT_LIGHT0);
 
     for(int z = 0; z < WORLD_SIZE_Z; ++z)
     {

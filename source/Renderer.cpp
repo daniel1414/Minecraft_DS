@@ -78,7 +78,7 @@ void Renderer::init()
 
 void Renderer::beginScene()
 { 
-    glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | (1 << 11) | POLY_ID(0) | POLY_FOG);
+    glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | (1 << 11) | POLY_ID(0) | POLY_FORMAT_LIGHT0);
 }
 void Renderer::endScene()
 {
@@ -95,7 +95,7 @@ void Renderer::drawQuad(const Vec3& position, const Vec3& size, const Vec2& texC
     
     storage.packedCommands[9] = FIFO_COMMAND_PACK(FIFO_BEGIN, FIFO_NORMAL, FIFO_TEX_COORD, FIFO_VERTEX16);
 	storage.packedCommands[10] = GL_QUADS; 
-	storage.packedCommands[11] = NORMAL_PACK(inttov10(normal.x), inttov10(normal.y), inttov10(normal.z));
+	storage.packedCommands[11] = NORMAL_PACK(normal.x, normal.y, normal.z);
 
     uint8_t textureIndexOffset = 0;
 
@@ -109,30 +109,30 @@ void Renderer::drawQuad(const Vec3& position, const Vec3& size, const Vec2& texC
     storage.texturePositions[7] = texCoords.y + 1;
     
     uint8_t vertexIndicesOffset = 0;
-    if(normal.z == 1)
+    if(normal.z == floattov10(0.97))
     {
         vertexIndicesOffset = 0;
         textureIndexOffset = 0;
     }
-    else if(normal.z == -1)
+    else if(normal.z == floattov10(-0.97))
     {
         vertexIndicesOffset = 4;
         textureIndexOffset = 4;
     }
-    else if(normal.y == 1)
+    else if(normal.y == floattov10(0.97))
     {
         vertexIndicesOffset = 8;
     }
-    else if(normal.y == -1)
+    else if(normal.y == floattov10(-0.97))
     {
         vertexIndicesOffset = 12;
         textureIndexOffset = 8;
     }
-    else if(normal.x == 1)
+    else if(normal.x == floattov10(0.97))
     {
         vertexIndicesOffset = 16;
     }
-    else if(normal.x == -1)
+    else if(normal.x == floattov10(-0.97))
     {
         vertexIndicesOffset = 20;
         textureIndexOffset = 4;
