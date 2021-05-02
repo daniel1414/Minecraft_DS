@@ -12,7 +12,7 @@ Camera::Camera(const Vec3& position) : m_position(position)
 /**
  * provide timeStep as f32
  */
-void Camera::processKeyInput(uint32 input, int32 timeStep)
+void Camera::processKeyInput(uint32 input, uint32 timeStep)
 {
     Vec3 xAxis = {inttof32(1), 0, 0};
     Vec3 zAxis = {0, 0, inttof32(1)};
@@ -111,7 +111,7 @@ PerspectiveCamera::PerspectiveCamera(const Vec3& position, int fovYDeg, int32 as
     setGlStuff();
 }
 
-void PerspectiveCamera::processKeyInput(uint32 input, int32 timeStep)
+void PerspectiveCamera::processKeyInput(uint32 input, uint32 timeStep)
 {
     Camera::processKeyInput(input, timeStep);
     if(cullFrustum)
@@ -207,7 +207,7 @@ void PerspectiveCamera::setGlStuff()
 /**
  * don't you dare use this shit
  */
-void OrthographicCamera::processKeyInput(uint32 input, int32 timeStep)
+void OrthographicCamera::processKeyInput(uint32 input, uint32 timeStep)
 {
     Camera::processKeyInput(input, timeStep);
 

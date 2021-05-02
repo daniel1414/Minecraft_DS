@@ -12,7 +12,7 @@ public:
     Camera(const Vec3& position);
     virtual ~Camera() = default;
 
-    virtual void processKeyInput(uint32 input, int32 timeStep);
+    virtual void processKeyInput(uint32 input, uint32 timeStep);
     virtual void processTouchInput(const touchPosition& input);
 
     virtual bool isInFrustum(Vec3* position, int32 radius) = 0;
@@ -45,7 +45,7 @@ class PerspectiveCamera: public Camera
 public:
     PerspectiveCamera(const Vec3& position, int fovYDeg, int32 aspectRatio, int32 near, int32 far);
     
-    void processKeyInput(uint32 input, int32 timeStep) override;
+    void processKeyInput(uint32 input, uint32 timeStep) override;
 
     bool isInFrustum(Vec3* position, int32 radius) override;
 
@@ -70,7 +70,7 @@ public:
         : Camera(position), m_halfWidth(divf32(width, inttof32(2))), m_halfHeight(divf32(height, inttof32(2))), 
         m_size(size) {}
     
-    void processKeyInput(uint32 input, int32 timeStep) override;
+    void processKeyInput(uint32 input, uint32 timeStep) override;
 private:
     int32 m_halfWidth, m_halfHeight, m_size;
     int32 m_frontDistance = inttof32(1);

@@ -9,11 +9,10 @@
 #include "center_cross.h"
 
 #include "Log.h"
-#include "NoiseGenerator.h"
-#include "Random.h"
 #include "Renderer.h"
 #include "Sprite.h"
 #include "World.h"
+#include "Player.h"
 
 #define DT_TIMER 0 
 
@@ -22,7 +21,7 @@ void dTTimerCallback()
 	timerStart(DT_TIMER, ClockDivider_1024, 0, dTTimerCallback);
 }
 
-Camera* mainCamera = nullptr;
+Player* player = nullptr;
 
 // culling - CCW are front
 int grass_texture;
@@ -75,7 +74,7 @@ int main(void) {
 
 	int angle = 0;
 
-	mainCamera =  new PerspectiveCamera({inttof32(0), inttof32(CHUNK_SIZE_Y), inttof32(3)}, 60, floattof32(256.0f / 192.0f), floattof32(0.1f), inttof32(50));
+	player = new Player();
 
 	SpriteAttributes centerCrossAttr = {"centerCross", 256 / 2, 192 / 2, (void*)center_crossTiles, center_crossTilesLen, (void*)center_crossPal, center_crossPalLen, SpriteSize_16x16};
 	Sprite* center_cross = Sprite::create(centerCrossAttr);
@@ -96,16 +95,16 @@ int main(void) {
 
 		if(keysH)
 		{
-			mainCamera->processKeyInput(keysH, deltaTime);
+			player->processKeyInput(keysH, deltaTime);
 		}
 		if(keysD & KEY_A)
 		{
-			world->destroyCube(mainCamera->getPosition(), -(Vec3)mainCamera->getFront());
+			world->destroyCube(player->getPosition(), -(Vec3)player->getCamera()->getFront());
 		}
 		//touch input
 		touchPosition touchPos;
 		touchRead(&touchPos);
-		mainCamera->processTouchInput(touchPos);
+		player->processTouchInput(touchPos);
 
 		//lighting
 		int x, y;
@@ -125,8 +124,8 @@ int main(void) {
 
 		glBindTexture(0, grass_texture);
 
-		world->drawTerrain(mainCamera);
-		world->drawPlants(mainCamera);
+		world->drawTerrain(player->getCamera());
+		world->drawPlants(player->getCamera());
 		
 		Renderer::endScene();
 
