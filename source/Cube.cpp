@@ -71,8 +71,8 @@ void PlantCube::drawFace(const Vec3& position, CUBE_FACES face) const
     switch(face)
     {
         case CUBE_FACE_ALL:
-            Renderer::drawQuad(position, {CUBE_SIZE, CUBE_SIZE, CUBE_SIZE}, m_texCoords[CUBE_TEXCOORD_SIDE], {TEXTURE_SIZE, TEXTURE_SIZE}, {floattov10(0.67f), 0, floattov10(0.67f)}, RGB15(31, 31, 31), 45, {0, inttof32(1), 0});
-		    Renderer::drawQuad(position, {CUBE_SIZE, CUBE_SIZE, CUBE_SIZE}, m_texCoords[CUBE_TEXCOORD_SIDE], {TEXTURE_SIZE, TEXTURE_SIZE}, {floattov10(-0.67f), 0, floattov10(-0.67f)}, RGB15(31, 31, 31), -45, {0, inttof32(1), 0});
+            Renderer::drawQuad(position, {CUBE_SIZE, CUBE_SIZE, CUBE_SIZE}, m_texCoords[CUBE_TEXCOORD_SIDE], {TEXTURE_SIZE, TEXTURE_SIZE}, {floattov10(0.7f), 0, floattov10(0.7f)}, RGB15(31, 31, 31), 45, {0, inttof32(1), 0});
+		    Renderer::drawQuad(position, {CUBE_SIZE, CUBE_SIZE, CUBE_SIZE}, m_texCoords[CUBE_TEXCOORD_SIDE], {TEXTURE_SIZE, TEXTURE_SIZE}, {floattov10(-0.7f), 0, floattov10(-0.7f)}, RGB15(31, 31, 31), -45, {0, inttof32(1), 0});
             break;
         case CUBE_FACE_BOTTOM:
         case CUBE_FACE_FRONT:

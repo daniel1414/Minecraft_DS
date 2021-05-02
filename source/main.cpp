@@ -61,12 +61,15 @@ int main(void) {
 	glColorTableEXT(0, 0, texture_classicPalLen / 2, 0, 0, (u16*)texture_classicPal);
 
 	uint8 emission = 10;
-	uint8 diffuse = 10;
+	uint8 diffuse = 15;
 	uint8 ambient = 8;
+	uint8 specular = 31;
 
 	//glMaterialf(GL_EMISSION, RGB15(emission, emission, emission));
 	glMaterialf(GL_AMBIENT, RGB15(ambient, ambient, ambient));
 	glMaterialf(GL_DIFFUSE, RGB15(diffuse, diffuse, diffuse));
+	glMaterialf(GL_SPECULAR, RGB15(specular, specular, specular));
+	glMaterialShinyness();
 
 	glLight(0, RGB15(31, 31, 31), 0, floattov10(-0.97f), 0);
 
