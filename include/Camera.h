@@ -1,6 +1,8 @@
 #pragma once
 
 #include <nds.h>
+#include <nds/arm9/math.h>
+#include <nds/arm9/trig_lut.h>
 
 #include "Log.h"
 
@@ -12,13 +14,15 @@ public:
     Camera(const Vec3& position);
     virtual ~Camera() = default;
 
-    virtual void processKeyInput(uint32 input, uint32 timeStep);
     virtual void processTouchInput(const touchPosition& input);
 
     virtual bool isInFrustum(Vec3* position, int32 radius) = 0;
 
     const Vec3& getPosition() const { return m_position; }
+    void setPosition(const Vec3& position) { m_position = position; }
+
     const Vec3& getFront() const { return m_front; }
+    const Vec3& getRight() const { return m_right; }
     virtual const Vec3* getPlaneNormals() const = 0;
 
 private:
@@ -45,7 +49,7 @@ class PerspectiveCamera: public Camera
 public:
     PerspectiveCamera(const Vec3& position, int fovYDeg, int32 aspectRatio, int32 near, int32 far);
     
-    void processKeyInput(uint32 input, uint32 timeStep) override;
+    void processTouchInput(const touchPosition& input) override;
 
     bool isInFrustum(Vec3* position, int32 radius) override;
 
@@ -69,8 +73,7 @@ public:
     OrthographicCamera(const Vec3& position, int32 width, int32 height, int32 size)
         : Camera(position), m_halfWidth(divf32(width, inttof32(2))), m_halfHeight(divf32(height, inttof32(2))), 
         m_size(size) {}
-    
-    void processKeyInput(uint32 input, uint32 timeStep) override;
+
 private:
     int32 m_halfWidth, m_halfHeight, m_size;
     int32 m_frontDistance = inttof32(1);

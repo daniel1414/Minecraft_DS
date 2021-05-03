@@ -17,6 +17,8 @@ public:
     void drawTerrain(Camera* camera) const;
     void drawPlants(Camera* camera) const;
     
+    Chunk* getChunk(const Vec3& position);
+    Cube* getCube(const Vec3& position);
     void updateChunks();
 private:
     Cube* m_cubeInstances[CUBE_TYPE_COUNT];

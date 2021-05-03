@@ -128,12 +128,30 @@ void World::drawPlants(Camera* camera) const
     glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | (1 << 11) | POLY_ID(0) | POLY_FOG);
 }
 
+Chunk* World::getChunk(const Vec3& position)
+{
+    Vec3 chunkIndex = {((position.x >> 12) + (WORLD_SIZE_X / 2) * CHUNK_SIZE_X) / CHUNK_SIZE_X, 0, ((position.z >> 12) + (WORLD_SIZE_Z / 2) * CHUNK_SIZE_Z) / CHUNK_SIZE_Z};
+    if(chunkIndex.z < WORLD_SIZE_Z && chunkIndex.x < WORLD_SIZE_X)
+        return m_chunks[chunkIndex.z * WORLD_SIZE_X + chunkIndex.x];
+    else
+        return nullptr;
+}
+
+Cube* World::getCube(const Vec3& position)
+{
+    Chunk* chunk = getChunk(position);
+    if(chunk != nullptr)
+        return chunk->getCube(position);
+    else
+        return nullptr;
+}
+
 void World::loadCubeInformation()
 {
     /* air cube */
     textureCoords = {Vec2{-1, -1}, Vec2{-1, -1}, Vec2{-1, -1}};
     faceOpacities = {false, false, false, false, false, false, false};
-    m_cubeInstances[CUBE_TYPE_OFFSET_AIR] = new Cube(textureCoords, faceOpacities);
+    m_cubeInstances[CUBE_TYPE_OFFSET_AIR] = new Cube(textureCoords, faceOpacities, false);
     /* grass cube */
     textureCoords = {Vec2{0, 0}, Vec2{16, 0}, Vec2{32, 0}};
     faceOpacities = {true, true, true, true, true, true, true};
@@ -173,7 +191,7 @@ void World::initChunks()
     {
         for(int x = 0; x < WORLD_SIZE_X; ++x)
         {
-            m_chunks[z * WORLD_SIZE_X + x] = new Chunk({inttof32((x - WORLD_SIZE_X / 2) * CHUNK_SIZE_X), inttof32((z - WORLD_SIZE_Z / 2) * CHUNK_SIZE_Z)}, m_cubeInstances);
+            m_chunks[z * WORLD_SIZE_X + x] = new Chunk({((x - WORLD_SIZE_X / 2) * CHUNK_SIZE_X) << 12, ((z - WORLD_SIZE_Z / 2) * CHUNK_SIZE_Z) << 12}, m_cubeInstances);
         }
     }
 

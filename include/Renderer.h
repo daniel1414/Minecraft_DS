@@ -3,8 +3,6 @@
 #include <nds.h>
 #include <nds/arm9/math.h>
 
-#include "Camera.h"
-
 class Renderer
 {
 public:

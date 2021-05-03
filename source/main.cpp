@@ -95,7 +95,7 @@ int main(void) {
 
 		if(keysH)
 		{
-			player->processKeyInput(keysH, deltaTime);
+			player->processKeyInput(keysH, deltaTime, world);
 		}
 		if(keysD & KEY_A)
 		{

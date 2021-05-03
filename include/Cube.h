@@ -41,16 +41,18 @@ enum CUBE_TEXTURE_COORDS
 class Cube
 {
 public:
-    Cube(Vec2 texCoords[], bool faceOpacities[]);
+    Cube(Vec2 texCoords[], bool faceOpacities[], bool solid = true);
     virtual ~Cube() = default;
 
     virtual void drawFace(const Vec3& position, CUBE_FACES face) const;
     void draw(const Vec3& position) const;
 
     bool isOpaque(CUBE_FACES face) const { return m_faceOpaque[face]; }
+    bool isSolid() const { return m_solid; }
 protected:
     Vec2 m_texCoords[3]; // according to CUBE_TEXTURE_COORDS
     bool m_faceOpaque[7]; // according to CUBE_FACES enum
+    bool m_solid;
     // add some other stuff according to every cube in the universe
 };
 

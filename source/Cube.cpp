@@ -2,7 +2,7 @@
 
 #include <nds/arm9/videoGL.h>
 
-Cube::Cube(Vec2 texCoords[], bool faceOpacities[])
+Cube::Cube(Vec2 texCoords[], bool faceOpacities[], bool solid) : m_solid(solid)
 {
     for(int i = 0; i < 3; ++i)
     {
@@ -41,7 +41,6 @@ void Cube::drawFace(const Vec3& position, CUBE_FACES face) const
             draw(position);
             break;
         default:
-            LOG("Invalid Cube face!", 0);
             break;
     }
 }
@@ -62,7 +61,7 @@ void Cube::draw(const Vec3& position) const
     drawFace(position, CUBE_FACE_TOP);
 }
 
-PlantCube::PlantCube(Vec2 texCoords[], bool faceOpacities[]) : Cube(texCoords, faceOpacities)
+PlantCube::PlantCube(Vec2 texCoords[], bool faceOpacities[]) : Cube(texCoords, faceOpacities, false)
 {
 }
 

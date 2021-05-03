@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Cube.h"
+#include "Camera.h"
 
 #define WORLD_SIZE_X    6 /* in chunks */
 #define WORLD_SIZE_Z    6 /* in chunks */
@@ -45,6 +46,8 @@ public:
     void drawPlants(Camera* camera) const;
 
     const Cube** getCubes() { return (const Cube**)m_cubes; }
+    Cube* getCube(const Vec3& position) const;
+    const Vec2& getPosition() const { return m_position; }
     void setNeighbour(CHUNK_SIDE side, Chunk* chunk) { m_sideChunks[side] = chunk; }
     void updateDrawList();
 private:

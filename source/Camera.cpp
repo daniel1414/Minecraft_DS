@@ -9,49 +9,6 @@ Camera::Camera(const Vec3& position) : m_position(position)
 {   
     recalculateVectors();
 };
-/**
- * provide timeStep as f32
- */
-void Camera::processKeyInput(uint32 input, uint32 timeStep)
-{
-    Vec3 xAxis = {inttof32(1), 0, 0};
-    Vec3 zAxis = {0, 0, inttof32(1)};
-    Vec3 frontdotX = xAxis * dotf32(&m_front.x, &xAxis.x);
-    Vec3 frontdotZ = zAxis * dotf32(&m_front.x, &zAxis.x);
-
-    Vec3 horizontalFront = frontdotX + frontdotZ;
-    normalizef32(&horizontalFront.x);
-
-    if(input & KEY_LEFT)
-    {
-        m_position.x -= mulf32(mulf32(m_speed, timeStep), m_right.x);
-        m_position.z -= mulf32(mulf32(m_speed, timeStep), m_right.z);
-    }
-    if(input & KEY_RIGHT)
-    {
-        m_position.x += mulf32(mulf32(m_speed, timeStep), m_right.x);
-        m_position.z += mulf32(mulf32(m_speed, timeStep), m_right.z);
-    }
-    if(input & KEY_UP)
-    {
-        m_position.x -= mulf32(mulf32(m_speed, timeStep), horizontalFront.x);
-        m_position.z -= mulf32(mulf32(m_speed, timeStep), horizontalFront.z);
-    }
-    if(input & KEY_DOWN)
-    {
-        m_position.x += mulf32(mulf32(m_speed, timeStep), horizontalFront.x);
-        m_position.z += mulf32(mulf32(m_speed, timeStep), horizontalFront.z);
-    }
-    if(input & KEY_R)
-    {
-        m_position.y += mulf32(m_speed, timeStep);
-    }
-    if(input & KEY_L)
-    {
-        m_position.y -= mulf32(m_speed, timeStep);
-    }
-    //LOG("camPos (%d,%d,%d)", m_position.x >> 12, m_position.y >> 12, m_position.z >> 12);
-}
 
 void Camera::processTouchInput(const touchPosition& input)
 {
@@ -111,11 +68,9 @@ PerspectiveCamera::PerspectiveCamera(const Vec3& position, int fovYDeg, int32 as
     setGlStuff();
 }
 
-void PerspectiveCamera::processKeyInput(uint32 input, uint32 timeStep)
+void PerspectiveCamera::processTouchInput(const touchPosition& input)
 {
-    Camera::processKeyInput(input, timeStep);
-    if(cullFrustum)
-        recalculateNormals();
+    Camera::processTouchInput(input);
     setGlStuff();
 }
 
@@ -201,23 +156,5 @@ void PerspectiveCamera::setGlStuff()
 	GFX_FIFO = -dotf32(&m_position.x, &m_right.x);
 	GFX_FIFO = -dotf32(&m_position.x, &m_up.x);
 	GFX_FIFO = -dotf32(&m_position.x, &m_front.x);
-
-}
-
-/**
- * don't you dare use this shit
- */
-void OrthographicCamera::processKeyInput(uint32 input, uint32 timeStep)
-{
-    Camera::processKeyInput(input, timeStep);
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrthof32(m_position.x - m_halfWidth, m_position.x + m_halfWidth,
-        m_position.y - m_halfHeight, m_position.y + m_halfHeight,
-        m_position.z + m_frontDistance, m_position.z + m_size + m_frontDistance);
-    
-    glRotatef32i(m_yaw, 0, inttof32(1), 0);
-    glRotatef32i(m_pitch, m_right.x, m_right.y, m_right.z);
 }
 

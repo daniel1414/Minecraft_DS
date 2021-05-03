@@ -218,6 +218,15 @@ void Chunk::drawPlants(Camera* camera) const
     }
 }
 
+Cube* Chunk::getCube(const Vec3& position) const
+{
+    Vec3 index = {f32toint(position.x - m_position.x), f32toint(position.y), f32toint(position.z - m_position.y)};
+    if(index.x < CHUNK_SIZE_X && index.y < CHUNK_SIZE_Y && index.z < CHUNK_SIZE_Z)
+        return m_cubes[index.y * CHUNK_SIZE_Z * CHUNK_SIZE_X + index.z * CHUNK_SIZE_X + index.x];
+    else   
+        return nullptr;
+}
+
 void Chunk::updateDrawList()
 {
     deleteDrawList();
