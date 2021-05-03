@@ -68,8 +68,8 @@ void Player::processKeyInput(uint32 input, uint32 timeStep, World* world)
                     if(input & KEY_LEFT)
                     {
                         futurePosition = {camPosition.x - mulf32(mulf32(m_speed, timeStep), camRight.x), camPosition.y, camPosition.z - mulf32(mulf32(m_speed, timeStep), camRight.z)};
-                        cube1 = world->getCube({futurePosition.x, futurePosition.y - CUBE_SIZE, futurePosition.z});
-                        cube2 = world->getCube(futurePosition);
+                        cube1 = world->getCube({futurePosition.x - mulf32(PLAYER_RADIUS, camRight.x), futurePosition.y - CUBE_SIZE, futurePosition.z - mulf32(PLAYER_RADIUS, camRight.z)});
+                        cube2 = world->getCube({futurePosition.x - mulf32(PLAYER_RADIUS, camRight.x), futurePosition.y, futurePosition.z - mulf32(PLAYER_RADIUS, camRight.z)});
                         if((cube1 == nullptr || !cube1->isSolid())
                             && (cube2 == nullptr || !cube2->isSolid()))
                         {
@@ -79,8 +79,8 @@ void Player::processKeyInput(uint32 input, uint32 timeStep, World* world)
                     if(input & KEY_RIGHT)
                     {
                         futurePosition = {camPosition.x + mulf32(mulf32(m_speed, timeStep), camRight.x), camPosition.y, camPosition.z + mulf32(mulf32(m_speed, timeStep), camRight.z)};
-                        cube1 = world->getCube({futurePosition.x, futurePosition.y - CUBE_SIZE, futurePosition.z});
-                        cube2 = world->getCube(futurePosition);
+                        cube1 = world->getCube({futurePosition.x + mulf32(PLAYER_RADIUS, camRight.x), futurePosition.y - CUBE_SIZE, futurePosition.z + mulf32(PLAYER_RADIUS, camRight.z)});
+                        cube2 = world->getCube({futurePosition.x + mulf32(PLAYER_RADIUS, camRight.x), futurePosition.y, futurePosition.z + mulf32(PLAYER_RADIUS, camRight.z)});
                         if((cube1 == nullptr || !cube1->isSolid())
                             && (cube2 == nullptr || !cube2->isSolid()))
                         {
@@ -90,8 +90,8 @@ void Player::processKeyInput(uint32 input, uint32 timeStep, World* world)
                     if(input & KEY_UP)
                     {
                         futurePosition = {camPosition.x - mulf32(mulf32(m_speed, timeStep), horizontalFront.x), camPosition.y, camPosition.z - mulf32(mulf32(m_speed, timeStep), horizontalFront.z)};
-                        cube1 = world->getCube({futurePosition.x, futurePosition.y - CUBE_SIZE, futurePosition.z});
-                        cube2 = world->getCube(futurePosition);
+                        cube1 = world->getCube({futurePosition.x - mulf32(PLAYER_RADIUS, horizontalFront.x), futurePosition.y - CUBE_SIZE, futurePosition.z - mulf32(PLAYER_RADIUS, horizontalFront.z)});
+                        cube2 = world->getCube({futurePosition.x - mulf32(PLAYER_RADIUS, horizontalFront.x), futurePosition.y, futurePosition.z - mulf32(PLAYER_RADIUS, horizontalFront.z)});
                         if((cube1 == nullptr || !cube1->isSolid())
                             && (cube2 == nullptr || !cube2->isSolid()))
                         {
@@ -101,8 +101,8 @@ void Player::processKeyInput(uint32 input, uint32 timeStep, World* world)
                     if(input & KEY_DOWN)
                     {
                         futurePosition = {camPosition.x + mulf32(mulf32(m_speed, timeStep), horizontalFront.x), camPosition.y, camPosition.z + mulf32(mulf32(m_speed, timeStep), horizontalFront.z)};
-                        cube1 = world->getCube({futurePosition.x, futurePosition.y - CUBE_SIZE, futurePosition.z});
-                        cube2 = world->getCube(futurePosition);
+                        cube1 = world->getCube({futurePosition.x + mulf32(PLAYER_RADIUS, horizontalFront.x), futurePosition.y - CUBE_SIZE, futurePosition.z - mulf32(PLAYER_RADIUS, horizontalFront.z)});
+                        cube2 = world->getCube({futurePosition.x + mulf32(PLAYER_RADIUS, horizontalFront.x), futurePosition.y, futurePosition.z - mulf32(PLAYER_RADIUS, horizontalFront.z)});
                         if((cube1 == nullptr || !cube1->isSolid())
                             && (cube2 == nullptr || !cube2->isSolid()))
                         {
@@ -122,8 +122,6 @@ void Player::processKeyInput(uint32 input, uint32 timeStep, World* world)
             }
             
             m_camera->setPosition(camPosition);
-            LOG("camPos (%d,%d,%d)", camPosition.x >> 12, camPosition.y >> 12, camPosition.z >> 12);
-
             break;
         }
         case GAMEPLAY_STATES::INVENTORY:
@@ -131,5 +129,36 @@ void Player::processKeyInput(uint32 input, uint32 timeStep, World* world)
             break;
         default:
             break;
+    }
+}
+
+void Player::jump()
+{
+    if(!m_falling)
+    {
+        m_falling = true;
+        m_fallingVelocity = floattof32(0.7f);
+    }
+}
+
+void Player::update(uint32 timeStep, World* world)
+{
+    if(m_falling)
+    {
+        m_fallingTime += timeStep;
+        m_fallingVelocity = floattof32(0.7f) - mulf32(floattof32(0.4f), m_fallingTime);
+        int32 deltaDist = mulf32(m_fallingVelocity, m_fallingTime);
+        Vec3 position = (Vec3)m_camera->getPosition() - Vec3{0, PLAYER_HEIGHT, 0};
+        Vec3 futurePosition = {position.x, position.y + deltaDist, position.z};
+        if(world->getCube(futurePosition) == nullptr || !world->getCube(futurePosition)->isSolid())
+            m_camera->setPosition(futurePosition + Vec3{0, PLAYER_HEIGHT, 0});
+        else
+        {
+            futurePosition.y = (((futurePosition.y + inttof32(1)) >> 12) << 12) + PLAYER_HEIGHT;
+            m_camera->setPosition(futurePosition);
+            m_fallingTime = 0;
+            m_fallingVelocity = 0;
+            m_falling = false;
+        }
     }
 }

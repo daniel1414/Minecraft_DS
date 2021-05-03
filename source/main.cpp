@@ -101,10 +101,15 @@ int main(void) {
 		{
 			world->destroyCube(player->getPosition(), -(Vec3)player->getCamera()->getFront());
 		}
+		if(keysD & KEY_B)
+		{
+			player->jump();
+		}
 		//touch input
 		touchPosition touchPos;
 		touchRead(&touchPos);
 		player->processTouchInput(touchPos);
+		player->update(deltaTime, world);
 
 		//lighting
 		int x, y;

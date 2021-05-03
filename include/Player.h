@@ -23,13 +23,13 @@ enum class GAMEPLAY_STATES
 class Player
 {
 public:
-
     Player();
 
     void processKeyInput(uint32 input, uint32 timeStep, World* world);
     void processTouchInput(const touchPosition& input) { m_camera->processTouchInput(input); }
 
     void jump();
+    void update(uint32 timeStep, World* world);
 
     Camera* getCamera() const { return m_camera; }
     const Vec3 getPosition() const { return m_camera->getPosition(); }
@@ -38,4 +38,7 @@ private:
     GAMEPLAY_STATES m_state;
     GAMEMODES m_mode;
     int32 m_speed = floattof32(0.6f);
+    int32 m_fallingTime = 0;
+    int32 m_fallingVelocity = 0;
+    bool m_falling = true;
 };
