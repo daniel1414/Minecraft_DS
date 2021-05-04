@@ -93,6 +93,10 @@ int main(void) {
 		uint32 keysH = keysHeld();
 		uint32 keysD = keysDown();
 
+		if(keysD & KEY_B)
+		{
+			player->jump();
+		}
 		if(keysH)
 		{
 			player->processKeyInput(keysH, deltaTime, world);
@@ -100,10 +104,6 @@ int main(void) {
 		if(keysD & KEY_A)
 		{
 			world->destroyCube(player->getPosition(), -(Vec3)player->getCamera()->getFront());
-		}
-		if(keysD & KEY_B)
-		{
-			player->jump();
 		}
 		//touch input
 		touchPosition touchPos;

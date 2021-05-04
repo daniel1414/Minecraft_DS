@@ -134,20 +134,37 @@ void Player::processKeyInput(uint32 input, uint32 timeStep, World* world)
 
 void Player::jump()
 {
-    if(!m_falling)
+    if(!m_falling && !m_jumping)
     {
-        m_falling = true;
-        m_fallingVelocity = floattof32(0.7f);
+        m_jumping = true;
     }
 }
 
 void Player::update(uint32 timeStep, World* world)
 {
-    if(m_falling)
+
+    if(m_jumping || m_falling)
     {
         m_fallingTime += timeStep;
-        m_fallingVelocity = floattof32(0.7f) - mulf32(floattof32(0.4f), m_fallingTime);
-        int32 deltaDist = mulf32(m_fallingVelocity, m_fallingTime);
+        
+        if(m_jumping)
+        {
+            m_fallingVelocity = PLAYER_JUMP_V0 - mulf32(PLAYER_GRAVITY, m_fallingTime);
+            if(m_fallingVelocity < 0)
+            {
+                m_jumping = false;
+                m_falling = true;
+                m_fallingTime = 0;
+                m_fallingVelocity = 0;
+            }
+        }
+        else if(m_falling)
+        {
+            m_fallingVelocity = -mulf32(PLAYER_GRAVITY, m_fallingTime);
+            if(m_fallingVelocity < floattof32(-2.6f))
+                m_fallingVelocity = floattof32(-2.6f);
+        }
+        int32 deltaDist = mulf32(m_fallingVelocity, timeStep);
         Vec3 position = (Vec3)m_camera->getPosition() - Vec3{0, PLAYER_HEIGHT, 0};
         Vec3 futurePosition = {position.x, position.y + deltaDist, position.z};
         if(world->getCube(futurePosition) == nullptr || !world->getCube(futurePosition)->isSolid())
@@ -159,6 +176,14 @@ void Player::update(uint32 timeStep, World* world)
             m_fallingTime = 0;
             m_fallingVelocity = 0;
             m_falling = false;
+        }
+    }
+    else
+    {
+        Cube* below = world->getCube((Vec3)m_camera->getPosition() - Vec3{0, mulf32(CUBE_SIZE, inttof32(2)), 0});
+        if(below == nullptr || !below->isSolid())
+        {
+            m_falling = true;
         }
     }
 }
