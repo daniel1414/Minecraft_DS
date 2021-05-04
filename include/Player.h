@@ -4,6 +4,7 @@
 
 #include "Camera.h"
 #include "World.h"
+#include "Inventory.h"
 
 #define PLAYER_HEIGHT floattof32(1.5f)
 #define PLAYER_RADIUS floattof32(0.2f)
@@ -26,18 +27,23 @@ enum class GAMEPLAY_STATES
 class Player
 {
 public:
-    Player();
+    Player(World* World);
 
-    void processKeyInput(uint32 input, uint32 timeStep, World* world);
+    void processKeyInput(uint32 input, uint32 timeStep);
     void processTouchInput(const touchPosition& input) { m_camera->processTouchInput(input); }
 
+    void destroyCube();
+    void placeCube();
     void jump();
-    void update(uint32 timeStep, World* world);
+
+    void update(uint32 timeStep);
 
     Camera* getCamera() const { return m_camera; }
     const Vec3 getPosition() const { return m_camera->getPosition(); }
 private:
     Camera* m_camera;
+    Inventory* m_inventory;
+    World* world;
     GAMEPLAY_STATES m_state;
     GAMEMODES m_mode;
     int32 m_speed = floattof32(0.8f);

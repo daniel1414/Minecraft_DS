@@ -74,12 +74,12 @@ int main(void) {
 
 	int angle = 0;
 
-	player = new Player();
-
 	SpriteAttributes centerCrossAttr = {"centerCross", 256 / 2, 192 / 2, (void*)center_crossTiles, center_crossTilesLen, (void*)center_crossPal, center_crossPalLen, SpriteSize_16x16};
 	Sprite* center_cross = Sprite::create(centerCrossAttr);
 
 	world = new World();
+
+	player = new Player(world);
 
 	timerStart(DT_TIMER, ClockDivider_1024, 0, dTTimerCallback);
 
@@ -99,17 +99,21 @@ int main(void) {
 		}
 		if(keysH)
 		{
-			player->processKeyInput(keysH, deltaTime, world);
+			player->processKeyInput(keysH, deltaTime);
 		}
-		if(keysD & KEY_A)
+		if(keysD & KEY_R)
 		{
-			world->destroyCube(player->getPosition(), -(Vec3)player->getCamera()->getFront());
+			player->destroyCube();
+		}
+		if(keysD & KEY_L)
+		{
+			player->placeCube();
 		}
 		//touch input
 		touchPosition touchPos;
 		touchRead(&touchPos);
 		player->processTouchInput(touchPos);
-		player->update(deltaTime, world);
+		player->update(deltaTime);
 
 		//lighting
 		int x, y;

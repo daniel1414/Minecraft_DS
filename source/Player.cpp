@@ -1,13 +1,15 @@
 #include "Player.h  "
 
-Player::Player()
+Player::Player(World* World)
 {
     m_camera = new PerspectiveCamera({inttof32(0), inttof32(CHUNK_SIZE_Y), inttof32(3)}, 60, floattof32(256.0f / 192.0f), floattof32(0.1f), inttof32(50));
+    m_inventory = new Inventory();
+    world = World;
     m_state = GAMEPLAY_STATES::EXPLORATION;
     m_mode = GAMEMODES::SURVIVAL;
 }
 
-void Player::processKeyInput(uint32 input, uint32 timeStep, World* world)
+void Player::processKeyInput(uint32 input, uint32 timeStep)
 {
     switch(m_state)
     {
@@ -109,14 +111,6 @@ void Player::processKeyInput(uint32 input, uint32 timeStep, World* world)
                             camPosition = futurePosition;
                         }
                     }
-                    if(input & KEY_R)
-                    {
-                        camPosition.y += mulf32(m_speed, timeStep);
-                    }
-                    if(input & KEY_L)
-                    {
-                        camPosition.y -= mulf32(m_speed, timeStep);
-                    }
                     break;
                 }
             }
@@ -132,6 +126,16 @@ void Player::processKeyInput(uint32 input, uint32 timeStep, World* world)
     }
 }
 
+void Player::destroyCube()
+{
+    m_inventory->addItem(world->destroyCube(m_camera->getPosition(), -(Vec3)m_camera->getFront()), 1u);
+}
+
+void Player::placeCube()
+{
+    world->placeCube(m_camera->getPosition(), -(Vec3)m_camera->getFront(), m_inventory->selectedCube);
+}
+
 void Player::jump()
 {
     if(!m_falling && !m_jumping)
@@ -140,9 +144,8 @@ void Player::jump()
     }
 }
 
-void Player::update(uint32 timeStep, World* world)
+void Player::update(uint32 timeStep)
 {
-
     if(m_jumping || m_falling)
     {
         m_fallingTime += timeStep;

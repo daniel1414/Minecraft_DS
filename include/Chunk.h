@@ -38,9 +38,10 @@ public:
     void plantOakTree(const Vec3& position);
     void setBlock(const Vec3& position, Cube* cubeInstance);
     void plantInitialPlants();
-    // returns true if operation is over
-    bool destroyCube(const Vec3& cameraPosition, const Vec3& cameraFront, int32 distance);
     
+    Cube* destroyCube(const Vec3& cameraPosition, const Vec3& cameraFront, int32 distance);
+    void placeCube(const Vec3& cameraPosition, const Vec3& cameraFront, Cube* cube, int32 distance);
+
     //void draw(Camera* camera) const;
     void drawTerrain(Camera* camera) const;
     void drawPlants(Camera* camera) const;
