@@ -13,7 +13,7 @@ public:
     void plantOakTree(const Vec3& position);
 
     Cube* destroyCube(const Vec3& cameraPosition, const Vec3& cameraDirection);
-    void placeCube(const Vec3& cameraPosition, const Vec3& cameraDirection, Cube* cube);
+    bool placeCube(const Vec3& cameraPosition, const Vec3& cameraDirection, Cube* cube);
 
     void drawTerrain(Camera* camera) const;
     void drawPlants(Camera* camera) const;

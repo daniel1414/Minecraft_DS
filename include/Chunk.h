@@ -40,7 +40,7 @@ public:
     void plantInitialPlants();
     
     Cube* destroyCube(const Vec3& cameraPosition, const Vec3& cameraFront, int32 distance);
-    void placeCube(const Vec3& cameraPosition, const Vec3& cameraFront, Cube* cube, int32 distance);
+    bool placeCube(const Vec3& cameraPosition, const Vec3& cameraFront, Cube* cube, int32 distance);
 
     //void draw(Camera* camera) const;
     void drawTerrain(Camera* camera) const;

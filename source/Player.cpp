@@ -6,7 +6,7 @@ Player::Player(World* World)
     m_inventory = new Inventory();
     world = World;
     m_state = GAMEPLAY_STATES::EXPLORATION;
-    m_mode = GAMEMODES::SURVIVAL;
+    m_mode = GAMEMODES::CREATIVE;
 }
 
 void Player::processKeyInput(uint32 input, uint32 timeStep)
@@ -51,11 +51,11 @@ void Player::processKeyInput(uint32 input, uint32 timeStep)
                         camPosition.x += mulf32(mulf32(m_speed, timeStep), horizontalFront.x);
                         camPosition.z += mulf32(mulf32(m_speed, timeStep), horizontalFront.z);
                     }
-                    if(input & KEY_R)
+                    if(input & KEY_A)
                     {
                         camPosition.y += mulf32(m_speed, timeStep);
                     }
-                    if(input & KEY_L)
+                    if(input & KEY_B)
                     {
                         camPosition.y -= mulf32(m_speed, timeStep);
                     }
@@ -133,7 +133,12 @@ void Player::destroyCube()
 
 void Player::placeCube()
 {
-    world->placeCube(m_camera->getPosition(), -(Vec3)m_camera->getFront(), m_inventory->selectedCube);
+    if(m_inventory->selectedCube != nullptr)
+    {
+        bool placed = world->placeCube(m_camera->getPosition(), -(Vec3)m_camera->getFront(), m_inventory->selectedCube);
+        //if(placed)
+            //m_inventory->deleteItem(m_inventory->selectedCube, 1);
+    }
 }
 
 void Player::jump()
@@ -146,47 +151,59 @@ void Player::jump()
 
 void Player::update(uint32 timeStep)
 {
-    if(m_jumping || m_falling)
+    switch(m_mode)
     {
-        m_fallingTime += timeStep;
-        
-        if(m_jumping)
+        case GAMEMODES::SURVIVAL:
         {
-            m_fallingVelocity = PLAYER_JUMP_V0 - mulf32(PLAYER_GRAVITY, m_fallingTime);
-            if(m_fallingVelocity < 0)
+            if(m_jumping || m_falling)
             {
-                m_jumping = false;
-                m_falling = true;
-                m_fallingTime = 0;
-                m_fallingVelocity = 0;
+                m_fallingTime += timeStep;
+                
+                if(m_jumping)
+                {
+                    m_fallingVelocity = PLAYER_JUMP_V0 - mulf32(PLAYER_GRAVITY, m_fallingTime);
+                    if(m_fallingVelocity < 0)
+                    {
+                        m_jumping = false;
+                        m_falling = true;
+                        m_fallingTime = 0;
+                        m_fallingVelocity = 0;
+                    }
+                }
+                else if(m_falling)
+                {
+                    m_fallingVelocity = -mulf32(PLAYER_GRAVITY, m_fallingTime);
+                    if(m_fallingVelocity < floattof32(-2.6f))
+                        m_fallingVelocity = floattof32(-2.6f);
+                }
+                int32 deltaDist = mulf32(m_fallingVelocity, timeStep);
+                Vec3 position = (Vec3)m_camera->getPosition() - Vec3{0, PLAYER_HEIGHT, 0};
+                Vec3 futurePosition = {position.x, position.y + deltaDist, position.z};
+                if(world->getCube(futurePosition) == nullptr || !world->getCube(futurePosition)->isSolid())
+                    m_camera->setPosition(futurePosition + Vec3{0, PLAYER_HEIGHT, 0});
+                else
+                {
+                    futurePosition.y = (((futurePosition.y + inttof32(1)) >> 12) << 12) + PLAYER_HEIGHT;
+                    m_camera->setPosition(futurePosition);
+                    m_fallingTime = 0;
+                    m_fallingVelocity = 0;
+                    m_falling = false;
+                }
             }
+            else
+            {
+                Cube* below = world->getCube((Vec3)m_camera->getPosition() - Vec3{0, mulf32(CUBE_SIZE, inttof32(2)), 0});
+                if(below == nullptr || !below->isSolid())
+                {
+                    m_falling = true;
+                }
+            }
+            break;
         }
-        else if(m_falling)
-        {
-            m_fallingVelocity = -mulf32(PLAYER_GRAVITY, m_fallingTime);
-            if(m_fallingVelocity < floattof32(-2.6f))
-                m_fallingVelocity = floattof32(-2.6f);
-        }
-        int32 deltaDist = mulf32(m_fallingVelocity, timeStep);
-        Vec3 position = (Vec3)m_camera->getPosition() - Vec3{0, PLAYER_HEIGHT, 0};
-        Vec3 futurePosition = {position.x, position.y + deltaDist, position.z};
-        if(world->getCube(futurePosition) == nullptr || !world->getCube(futurePosition)->isSolid())
-            m_camera->setPosition(futurePosition + Vec3{0, PLAYER_HEIGHT, 0});
-        else
-        {
-            futurePosition.y = (((futurePosition.y + inttof32(1)) >> 12) << 12) + PLAYER_HEIGHT;
-            m_camera->setPosition(futurePosition);
-            m_fallingTime = 0;
-            m_fallingVelocity = 0;
-            m_falling = false;
-        }
+        case GAMEMODES::CREATIVE:
+            break;
+        default:
+            break;
     }
-    else
-    {
-        Cube* below = world->getCube((Vec3)m_camera->getPosition() - Vec3{0, mulf32(CUBE_SIZE, inttof32(2)), 0});
-        if(below == nullptr || !below->isSolid())
-        {
-            m_falling = true;
-        }
-    }
+    
 }

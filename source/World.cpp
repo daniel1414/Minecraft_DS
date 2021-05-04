@@ -58,10 +58,10 @@ Cube* World::destroyCube(const Vec3& cameraPosition, const Vec3& cameraDirection
     return m_chunks[chunkIndex.z * WORLD_SIZE_X + chunkIndex.x]->destroyCube(cameraPosition, cameraDirection, CUBE_DESTRUCTION_RADIUS);
 }
 
-void World::placeCube(const Vec3& cameraPosition, const Vec3& cameraDirection, Cube* cube)
+bool World::placeCube(const Vec3& cameraPosition, const Vec3& cameraDirection, Cube* cube)
 {
     Vec3 chunkIndex = {((cameraPosition.x >> 12) + (WORLD_SIZE_X / 2) * CHUNK_SIZE_X) / CHUNK_SIZE_X, 0, ((cameraPosition.z >> 12) + (WORLD_SIZE_Z / 2) * CHUNK_SIZE_Z) / CHUNK_SIZE_Z};
-    m_chunks[chunkIndex.z * WORLD_SIZE_X + chunkIndex.x]->placeCube(cameraPosition, cameraDirection, cube, CUBE_DESTRUCTION_RADIUS);
+    return m_chunks[chunkIndex.z * WORLD_SIZE_X + chunkIndex.x]->placeCube(cameraPosition, cameraDirection, cube, CUBE_DESTRUCTION_RADIUS);
 }
 
 void World::drawTerrain(Camera* camera) const

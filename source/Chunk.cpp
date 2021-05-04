@@ -168,9 +168,10 @@ Cube* Chunk::destroyCube(const Vec3& cameraPosition, const Vec3& cameraFront, in
     return cubeFound;
 }
 
-void Chunk::placeCube(const Vec3& cameraPosition, const Vec3& cameraFront, Cube* cube, int32 distance)
+bool Chunk::placeCube(const Vec3& cameraPosition, const Vec3& cameraFront, Cube* cube, int32 distance)
 {
     bool result = false;
+    bool placed = false;
     /* position in the chunk */
     Vec3 playerPosition = {cameraPosition.x - m_position.x, cameraPosition.y, cameraPosition.z - m_position.y};
     Vec3 rayPosition = playerPosition;
@@ -179,32 +180,48 @@ void Chunk::placeCube(const Vec3& cameraPosition, const Vec3& cameraFront, Cube*
     while(!result)
     {
         if((rayPosition.x >> 12) < 0)
-            m_sideChunks[CHUNK_SIDE_LEFT]->placeCube({m_position.x + rayPosition.x, rayPosition.y, m_position.y + rayPosition.z}, cameraFront, cube, distance - Vec3::dist(playerPosition, rayPosition));
+            return m_sideChunks[CHUNK_SIDE_LEFT]->placeCube({m_position.x + rayPosition.x, rayPosition.y, m_position.y + rayPosition.z}, cameraFront, cube, distance - Vec3::dist(playerPosition, rayPosition));
         if((rayPosition.x >> 12) > CHUNK_SIZE_X - 1)
-            m_sideChunks[CHUNK_SIDE_RIGHT]->placeCube({m_position.x + rayPosition.x, rayPosition.y, m_position.y + rayPosition.z}, cameraFront, cube, distance - Vec3::dist(playerPosition, rayPosition));
+            return m_sideChunks[CHUNK_SIDE_RIGHT]->placeCube({m_position.x + rayPosition.x, rayPosition.y, m_position.y + rayPosition.z}, cameraFront, cube, distance - Vec3::dist(playerPosition, rayPosition));
         if((rayPosition.z >> 12) < 0)
-            m_sideChunks[CHUNK_SIDE_BACK]->placeCube({m_position.x + rayPosition.x, rayPosition.y, m_position.y + rayPosition.z}, cameraFront, cube, distance - Vec3::dist(playerPosition, rayPosition));
+            return m_sideChunks[CHUNK_SIDE_BACK]->placeCube({m_position.x + rayPosition.x, rayPosition.y, m_position.y + rayPosition.z}, cameraFront, cube, distance - Vec3::dist(playerPosition, rayPosition));
         if((rayPosition.z >> 12) > CHUNK_SIZE_Z - 1)
-            m_sideChunks[CHUNK_SIDE_FRONT]->placeCube({m_position.x + rayPosition.x, rayPosition.y, m_position.y + rayPosition.z}, cameraFront, cube, distance - Vec3::dist(playerPosition, rayPosition));
-
+            return m_sideChunks[CHUNK_SIDE_FRONT]->placeCube({m_position.x + rayPosition.x, rayPosition.y, m_position.y + rayPosition.z}, cameraFront, cube, distance - Vec3::dist(playerPosition, rayPosition));
+        
         if(((rayPosition.y >> 12) < CHUNK_SIZE_Y && (rayPosition.y >> 12) > -1) &&
             ((rayPosition.z >> 12) < CHUNK_SIZE_Z && (rayPosition.z >> 12) > -1) && 
             ((rayPosition.x >> 12) < CHUNK_SIZE_X && (rayPosition.x >> 12) > -1)) // check if position does not exceed the chunk limits
         {
-            if(m_cubes[(rayPosition.y >> 12) * CHUNK_SIZE_Z * CHUNK_SIZE_X + (rayPosition.z >> 12) * CHUNK_SIZE_X + (rayPosition.x >> 12)] != m_cubeInstances[CUBE_TYPE_OFFSET_AIR])
+            if(m_cubes[(rayPosition.y >> 12) * CHUNK_SIZE_Z * CHUNK_SIZE_X + (rayPosition.z >> 12) * CHUNK_SIZE_X + (rayPosition.x >> 12)]->isSolid())
             {
                 rayPosition -= step;
-                m_cubes[(rayPosition.y >> 12) * CHUNK_SIZE_Z * CHUNK_SIZE_X + (rayPosition.z >> 12) * CHUNK_SIZE_X + (rayPosition.x >> 12)] = cube;
-                result = true;
-                if((rayPosition.x >> 12) == 0)
+                if((rayPosition.x >> 12) < 0)
+                {
+                    m_sideChunks[CHUNK_SIDE_LEFT]->getCubes()[(rayPosition.y >> 12) * CHUNK_SIZE_Z * CHUNK_SIZE_X + (rayPosition.z >> 12) * CHUNK_SIZE_X + CHUNK_SIZE_X - 1] = cube;
                     m_sideChunks[CHUNK_SIDE_LEFT]->updateDrawList();
-                else if((rayPosition.x >> 12 == CHUNK_SIZE_X - 1))
+                }
+                else if((rayPosition.x >> 12) > CHUNK_SIZE_X - 1)
+                {
+                    m_sideChunks[CHUNK_SIDE_RIGHT]->getCubes()[(rayPosition.y >> 12) * CHUNK_SIZE_Z * CHUNK_SIZE_X + (rayPosition.z >> 12) * CHUNK_SIZE_X] = cube;
                     m_sideChunks[CHUNK_SIDE_RIGHT]->updateDrawList();
-                if((rayPosition.z >> 12) == 0)
+                }
+                else if((rayPosition.z >> 12) < 0)
+                {
+                    m_sideChunks[CHUNK_SIDE_BACK]->getCubes()[(rayPosition.y >> 12) * CHUNK_SIZE_Z * CHUNK_SIZE_X + (CHUNK_SIZE_Z - 1) * CHUNK_SIZE_X + (rayPosition.x >> 12)] = cube;
                     m_sideChunks[CHUNK_SIDE_BACK]->updateDrawList();
-                else if((rayPosition.z >> 12) == CHUNK_SIZE_Z - 1)
+                }
+                else if((rayPosition.z >> 12) > CHUNK_SIZE_Z - 1)
+                {
+                    m_sideChunks[CHUNK_SIDE_FRONT]->getCubes()[(rayPosition.y >> 12) * CHUNK_SIZE_Z * CHUNK_SIZE_X + 0 * CHUNK_SIZE_X + (rayPosition.x >> 12)] = cube;
                     m_sideChunks[CHUNK_SIDE_FRONT]->updateDrawList();
-                updateDrawList();
+                }
+                else
+                {
+                    m_cubes[(rayPosition.y >> 12) * CHUNK_SIZE_Z * CHUNK_SIZE_X + (rayPosition.z >> 12) * CHUNK_SIZE_X + (rayPosition.x >> 12)] = cube;
+                    updateDrawList();
+                }
+                result = true;
+                placed = true;
             }
         }
         while(((rayPosition.x >> 12) == (lastRayPosition.x >> 12)) && ((rayPosition.y >> 12) == (lastRayPosition.y >> 12)) && ((rayPosition.z >> 12) == (lastRayPosition.z >> 12)) && !result)
@@ -216,6 +233,7 @@ void Chunk::placeCube(const Vec3& cameraPosition, const Vec3& cameraFront, Cube*
         }
         lastRayPosition = rayPosition;
     }
+    return placed;
 }
 
 void Chunk::drawTerrain(Camera* camera) const

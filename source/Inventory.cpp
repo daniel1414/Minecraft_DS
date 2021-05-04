@@ -20,5 +20,7 @@ void Inventory::deleteItem(Cube* cube, uint8 count)
             m_items[cube] = 0;
         else 
             m_items[cube] -= count;
+        if(m_items[cube] == 0)
+            selectedCube = nullptr;
     }
 }
