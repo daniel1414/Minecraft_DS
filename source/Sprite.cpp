@@ -264,10 +264,8 @@ void Sprite::changeOamIfNeeded()
 void Sprite::update() const
 {
     auto size = spriteSizeIntoWidthHeight(m_Attributes.size);
-    int y = 192 - m_Attributes.y - (size.second / 2);
-    if(m_Attributes.y >= 0 && m_Attributes.y < 384)
-        y = 192 - (m_Attributes.y % 192) - (size.second / 2);
-    oamSet(m_Attributes.oam, m_Attributes.id, m_Attributes.x - (size.first / 2), y, m_Attributes.priority, m_Attributes.paletteAlpha, 
+    int y = (-m_Attributes.y + 384) % 192;
+    oamSet(m_Attributes.oam, m_Attributes.id, m_Attributes.x, y, m_Attributes.priority, m_Attributes.paletteAlpha, 
         m_Attributes.size, m_Attributes.colorFormat, m_Attributes.gfx, m_Attributes.affineIndex, m_Attributes.sizeDouble,
         m_Attributes.hidden, m_Attributes.hflip, m_Attributes.vflip, m_Attributes.mosaic);
 }

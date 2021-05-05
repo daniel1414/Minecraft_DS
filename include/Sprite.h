@@ -17,7 +17,7 @@ struct SpriteAttributes
     SpriteAttributes(const std::string& Name, int X, int Y, void* Tiles, int TilesLen, void* Palette, int PaletteLen, 
         SpriteSize Size = SpriteSize_16x16)
         : name(Name), x(X), y(Y), tiles(Tiles), tilesLen(TilesLen), palette(Palette), paletteLen(PaletteLen), size(Size) {
-            oam  = y > 192 ? &oamSub : &oamMain;
+            oam = y < 192 ? &oamSub : &oamMain;
         }
     
     std::string name;
