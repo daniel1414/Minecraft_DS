@@ -6,6 +6,7 @@
 #include <nds/timers.h>
 
 #include "texture_classic.h"
+#include "item_slot.h"
 #include "center_cross.h"
 
 #include "Log.h"
@@ -71,8 +72,10 @@ int main(void) {
 
 	int angle = 0;
 
-	SpriteAttributes centerCrossAttr = {"centerCross", 256 / 2, 192 / 2, (void*)center_crossTiles, center_crossTilesLen, (void*)center_crossPal, center_crossPalLen, SpriteSize_16x16};
-	Sprite* center_cross = Sprite::create(centerCrossAttr);
+	SpriteAttributes spriteAttr = {"centerCross", 256 / 2, 192 / 2, (void*)center_crossTiles, center_crossTilesLen, (void*)center_crossPal, center_crossPalLen};
+	Sprite* center_cross = Sprite::create(spriteAttr);
+	spriteAttr = {"itemSlot", 48, 192, (void*)item_slotTiles, item_slotTilesLen, (void*)item_slotPal, item_slotPalLen, SpriteSize_16x16};
+	Sprite* grass = Sprite::create(spriteAttr);
 
 	world = new World();
 
@@ -90,10 +93,10 @@ int main(void) {
 		uint32 keysH = keysHeld();
 		uint32 keysD = keysDown();
 
-		/* if(keysD & KEY_B)
+		if(keysD & KEY_B)
 		{
 			player->jump();
-		} */
+		}
 		if(keysH)
 		{
 			player->processKeyInput(keysH, deltaTime);

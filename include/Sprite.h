@@ -12,27 +12,10 @@
 class Sprite;
 struct SpriteAttributes;
 
-class SpriteRegistry
-{
-public:
-    static SpriteRegistry* get();
-
-    void add(SpriteAttributes& attributes);
-    void remove(const std::string& name);
-    Sprite* getSprite(const std::string& name);
-    void update();
-private:
-    void paletteCleanUp(OamState* oam);
-private:
-    SpriteRegistry();
-    static SpriteRegistry* s_Instance;
-    std::map<std::string, Sprite> m_Registry;
-};
-
 struct SpriteAttributes
 {
     SpriteAttributes(const std::string& Name, int X, int Y, void* Tiles, int TilesLen, void* Palette, int PaletteLen, 
-        SpriteSize Size = SpriteSize_32x32)
+        SpriteSize Size = SpriteSize_16x16)
         : name(Name), x(X), y(Y), tiles(Tiles), tilesLen(TilesLen), palette(Palette), paletteLen(PaletteLen), size(Size) {
             oam  = y > 192 ? &oamSub : &oamMain;
         }

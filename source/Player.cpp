@@ -6,7 +6,7 @@ Player::Player(World* World)
     m_inventory = new Inventory();
     world = World;
     m_state = GAMEPLAY_STATES::EXPLORATION;
-    m_mode = GAMEMODES::CREATIVE;
+    m_mode = GAMEMODES::SURVIVAL;
 }
 
 void Player::processKeyInput(uint32 input, uint32 timeStep)
@@ -136,8 +136,8 @@ void Player::placeCube()
     if(m_inventory->selectedCube != nullptr)
     {
         bool placed = world->placeCube(m_camera->getPosition(), -(Vec3)m_camera->getFront(), m_inventory->selectedCube);
-        //if(placed)
-            //m_inventory->deleteItem(m_inventory->selectedCube, 1);
+        if(placed)
+            m_inventory->deleteItem(m_inventory->selectedCube, 1);
     }
 }
 

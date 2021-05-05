@@ -11,6 +11,7 @@ public:
 
     void addItem(Cube* cube, uint8 count);
     void deleteItem(Cube* cube, uint8 count);
+
     Cube* selectedCube = nullptr;
 private:
     std::unordered_map<Cube*, uint8> m_items;

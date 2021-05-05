@@ -7,8 +7,8 @@ For now it's jutst a small floating terrain with a camera where you can move aro
 
 # Features to implement:
   - Rendering optimization
-  - Placing blocks
   - World generation refinement (stones, ores, caves etc.)
+  - Crafting
   - Water
   - Day and Night cycle
   - Lighting
@@ -23,3 +23,4 @@ For now it's jutst a small floating terrain with a camera where you can move aro
   - World generation (used with own implementation of two dimensional Perlin Noise based on Dave Mount & Roger Eastman's CMSC 425 Lecture 13)
   - Camera (inspired by Joey de Vries's tutorial from learnopengl.com)
   - Block destruction
+  - Block placing
