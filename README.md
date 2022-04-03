@@ -14,7 +14,7 @@ For now it's jutst a small floating terrain with a camera where you can move aro
   - Lighting
   - Monsters
   - So much more
-
+ 
 # Shots from the game
 
 ![](game_images/plants.png) ![](game_images/hole.png) ![](game_images/lighting.png) ![](game_images/stone_mine.png)
