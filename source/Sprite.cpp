@@ -1,5 +1,6 @@
 #include <nds.h>
 #include <nds/arm9/trig_lut.h>
+#include <nds/arm9/math.h>
 
 #include "Log.h"
 #include "Sprite.h"

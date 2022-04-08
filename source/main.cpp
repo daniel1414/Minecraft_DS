@@ -74,7 +74,7 @@ int main(void) {
 
 	SpriteAttributes spriteAttr = {"centerCross", 120, 296, (void*)center_crossTiles, center_crossTilesLen, (void*)center_crossPal, center_crossPalLen};
 	Sprite* center_cross = Sprite::create(spriteAttr);
-	spriteAttr = {"itemSlot", 0, 16, (void*)item_slotTiles, item_slotTilesLen, (void*)item_slotPal, item_slotPalLen, SpriteSize_16x16};
+	spriteAttr = {"itemSlot", 48, 208, (void*)item_slotTiles, item_slotTilesLen, (void*)item_slotPal, item_slotPalLen, SpriteSize_16x16};
 	Sprite* itemSlot = Sprite::create(spriteAttr);
 
 	world = new World();
